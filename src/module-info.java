@@ -1,4 +1,5 @@
 module calouself {
-    requires javafx.graphics;
+    requires transitive javafx.controls;
+    requires java.sql;
     opens main;
 }
