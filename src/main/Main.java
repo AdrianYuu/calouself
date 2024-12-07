@@ -12,7 +12,7 @@ public final class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        PageManager.setPrimaryStage(stage);
+        PageManager.initialize(stage);
     }
 
 }

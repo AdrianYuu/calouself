@@ -10,9 +10,10 @@ public abstract class Page {
         return scene;
     }
 
-    public abstract void createOrRefreshPage();
-
     public void setScene(Scene scene) {
         this.scene = scene;
     }
+
+    public abstract void createOrRefreshPage();
+
 }

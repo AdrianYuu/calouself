@@ -54,13 +54,17 @@ public final class Connect {
         }
     }
 
-    public PreparedStatement prepareStatement(String query) {
-        PreparedStatement ps = null;
+    public boolean executePreparedUpdate(String query, Object... parameters) {
         try {
-            ps = con.prepareStatement(query);
+            PreparedStatement ps = con.prepareStatement(query);
+            for (int i = 0; i < parameters.length; i++) {
+                ps.setObject(i + 1, parameters[i]);
+            }
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
-        return ps;
     }
 }
