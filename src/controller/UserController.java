@@ -21,6 +21,12 @@ public final class UserController {
             return new Response<>(false, validationResult, null);
         }
 
+        boolean isSuccess = User.create(username, password, phoneNumber, address, role);
+
+        if(!isSuccess){
+            return new Response<>(false, "Failed to register user.", null);
+        }
+
         return new Response<>(true, "Successfully register user.", null);
     }
 

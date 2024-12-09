@@ -21,16 +21,9 @@ public final class User {
         this.role = role;
     }
 
-    public static Response<User> create(String username, String password, String phoneNumber, String address, String role) {
+    public static boolean create(String username, String password, String phoneNumber, String address, String role) {
         String query = "INSERT INTO users (username, password, phone_number, address, role) VALUES (?, ?, ?, ?, ?)";
-
-        boolean isSuccess = Connect.getConnection().executePreparedUpdate(query, username, password, phoneNumber, address, role);
-
-        if (!isSuccess) {
-            return new Response<User>(false, "Failed to create user.", null);
-        }
-
-        return new Response<User>(true, "Successfully create user.", null);
+        return Connect.getConnection().executePreparedUpdate(query, username, password, phoneNumber, address, role);
     }
 
 }

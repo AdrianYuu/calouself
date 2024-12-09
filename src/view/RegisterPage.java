@@ -117,8 +117,8 @@ public final class RegisterPage extends Page implements IComponent {
 
     @Override
     public void setStyle() {
-        pageLbl.setStyle("-fx-font-size: 64px; -fx-font-weight: bolder; -fx-font-style: italic;");
-        titleLbl.setStyle("-fx-font-size: 20px; -fx-font-weight: bold");
+        pageLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 64px; -fx-font-weight: bolder; -fx-font-style: italic");
+        titleLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 20px; -fx-font-weight: bold");
     }
 
     @Override
@@ -138,6 +138,7 @@ public final class RegisterPage extends Page implements IComponent {
                 return;
             }
 
+            AlertHelper.showInfo("Success", "Success", response.message);
         });
     }
 
