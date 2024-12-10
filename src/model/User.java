@@ -1,7 +1,6 @@
 package model;
 
 import lib.db.Connect;
-import lib.response.Response;
 
 public final class User {
 

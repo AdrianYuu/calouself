@@ -1,19 +1,19 @@
 package view.base;
 
-import javafx.scene.Scene;
+import interfaces.IComponent;
+import javafx.scene.layout.BorderPane;
 
-public abstract class Page {
+public abstract class Page extends BorderPane implements IComponent {
 
-    private Scene scene;
-
-    public Scene getScene() {
-        return scene;
+    public void createOrRefreshPage() {
+        init();
+        setLayout();
+        setStyle();
+        setEvent();
     }
 
-    public void setScene(Scene scene) {
-        this.scene = scene;
+    public Page getPage() {
+        return this;
     }
-
-    public abstract void createOrRefreshPage();
 
 }
