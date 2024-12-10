@@ -28,10 +28,10 @@ public final class PageManager {
         primaryStage.show();
     }
 
-    public static void setSceneRoot(Page root, String pageTitle) {
-        primaryStage.getScene().setRoot(root);
+    public static void changePage(Page page, String pageTitle) {
+        primaryStage.getScene().setRoot(page);
         primaryStage.setTitle(pageTitle);
-        root.getPage().createOrRefreshPage();
+        page.getPage().createOrRefreshPage();
     }
 
 }

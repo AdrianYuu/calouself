@@ -125,7 +125,7 @@ public final class RegisterPage extends Page {
         });
 
         loginHl.setOnMouseClicked(e -> {
-            PageManager.setSceneRoot(LoginPage.getInstance(), "Login Page");
+            PageManager.changePage(LoginPage.getInstance(), "Login Page");
         });
     }
 
