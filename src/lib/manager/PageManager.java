@@ -3,7 +3,7 @@ package lib.manager;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import view.RegisterPage;
+import view.LoginPage;
 
 import java.util.Objects;
 
@@ -17,7 +17,7 @@ public final class PageManager {
         Image appIcon = new Image(Objects.requireNonNull(PageManager.class.getResource("/assets/app_icon.png")).toExternalForm());
         primaryStage.getIcons().add(appIcon);
 
-        primaryStage.setScene(RegisterPage.getInstance().getScene());
+        primaryStage.setScene(LoginPage.getInstance().getScene());
 
         primaryStage.setResizable(false);
 

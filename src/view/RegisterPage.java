@@ -9,6 +9,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import lib.manager.PageManager;
 import lib.response.Response;
 import model.User;
 import utils.AlertHelper;
@@ -48,6 +49,8 @@ public final class RegisterPage extends Page implements IComponent {
     private RadioButton sellerRadioBtn;
 
     private Button submitBtn;
+    
+    private Hyperlink loginHl;
 
     @Override
     public void init() {
@@ -81,6 +84,8 @@ public final class RegisterPage extends Page implements IComponent {
         sellerRadioBtn = new RadioButton("Seller");
 
         submitBtn = new Button("Submit");
+        
+        loginHl = new Hyperlink("Login");
     }
 
     @Override
@@ -105,7 +110,7 @@ public final class RegisterPage extends Page implements IComponent {
         buyerRadioBtn.setToggleGroup(roleGroup);
         sellerRadioBtn.setToggleGroup(roleGroup);
 
-        container.getChildren().addAll(pageLbl, titleLbl, usernameContainer, passwordContainer, phoneNumberContainer, addressContainer, roleContainer, submitBtn);
+        container.getChildren().addAll(pageLbl, titleLbl, usernameContainer, passwordContainer, phoneNumberContainer, addressContainer, roleContainer, submitBtn, loginHl);
         container.setAlignment(Pos.CENTER);
         container.setSpacing(14);
         container.setMaxWidth(600);
@@ -137,17 +142,15 @@ public final class RegisterPage extends Page implements IComponent {
                 AlertHelper.showError("Error", "Error", response.message);
                 return;
             }
+            
 
             AlertHelper.showInfo("Success", "Success", response.message);
         });
-    }
-
-    @Override
-    public void createOrRefreshPage() {
-        init();
-        setLayout();
-        setStyle();
-        setEvent();
+        
+        loginHl.setOnMouseClicked(e -> {
+    		PageManager.setScene(LoginPage.getInstance().getScene());
+    		createOrRefreshPage();
+    	});
     }
 
     private static RegisterPage instance;

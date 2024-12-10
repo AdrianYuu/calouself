@@ -1,8 +1,9 @@
 package view.base;
 
+import interfaces.IComponent;
 import javafx.scene.Scene;
 
-public abstract class Page {
+public abstract class Page implements IComponent{
 
     private Scene scene;
 
@@ -14,6 +15,12 @@ public abstract class Page {
         this.scene = scene;
     }
 
-    public abstract void createOrRefreshPage();
+    public void createOrRefreshPage() {
+        init();
+        setLayout();
+        setStyle();
+        setEvent();
+    }
+
 
 }
