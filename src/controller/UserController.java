@@ -18,16 +18,16 @@ public final class UserController {
         String validationResult = checkAccountValidation(username, password, phoneNumber, address, role);
 
         if (!validationResult.isBlank()) {
-            return new Response<>(false, validationResult, null);
+        	return Response.Failed(validationResult);
         }
 
         boolean isSuccess = User.create(username, password, phoneNumber, address, role);
 
         if (!isSuccess) {
-            return new Response<>(false, "Failed to register user.", null);
+        	return Response.Failed("Failed to register user.");
         }
 
-        return new Response<>(true, "Successfully register user.", null);
+        return Response.Success(null);
     }
 
     public String checkAccountValidation(String username, String password, String phoneNumber, String address, String role) {
@@ -36,6 +36,28 @@ public final class UserController {
         }
 
         return "";
+    }
+    
+    public Response<User> login(String username, String password) {
+    	if (username.isEmpty()) {
+    		return Response.Failed("Username can't be empty.");
+    	}
+    	
+    	if (password.isEmpty()) {
+    		return Response.Failed("Password can't be empty.");
+    	}
+    	
+    	User user = User.get(username);
+    	
+    	if (user == null) {
+    		return Response.Failed("User not found.");
+    	}
+    	
+    	else if (!user.getPassword().equals(password)) {
+    		return Response.Failed("Wrong password.");
+    	}
+    	
+    	return Response.Success(user);
     }
 
 }

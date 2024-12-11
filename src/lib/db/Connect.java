@@ -43,6 +43,20 @@ public final class Connect {
         }
         return rs;
     }
+    
+    public ResultSet executePreparedQuery(String query, Object... parameters) {
+        ResultSet rs = null;
+        try {
+            PreparedStatement ps = con.prepareStatement(query);
+            for (int i = 0; i < parameters.length; i++) {
+                ps.setObject(i + 1, parameters[i]);
+            }
+            rs = ps.executeQuery();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return rs;
+    }
 
     public boolean executeUpdate(String query) {
         try {

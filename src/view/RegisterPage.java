@@ -5,10 +5,11 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import lib.manager.PageManager;
 import lib.response.Response;
 import model.User;
-import utils.AlertHelper;
+//import utils.AlertHelper;
 import view.base.Page;
 
 public final class RegisterPage extends Page {
@@ -42,10 +43,10 @@ public final class RegisterPage extends Page {
     private ToggleGroup roleGroup;
     private RadioButton buyerRadioBtn;
     private RadioButton sellerRadioBtn;
+    
+    private Label errorLbl;
 
     private Button submitBtn;
-    
-    private Hyperlink loginHl;
 
     private Hyperlink loginHl;
 
@@ -78,6 +79,8 @@ public final class RegisterPage extends Page {
         roleGroup = new ToggleGroup();
         buyerRadioBtn = new RadioButton("Buyer");
         sellerRadioBtn = new RadioButton("Seller");
+        
+        errorLbl = new Label();
 
         submitBtn = new Button("Submit");
         loginHl = new Hyperlink("Login");
@@ -105,7 +108,7 @@ public final class RegisterPage extends Page {
         buyerRadioBtn.setToggleGroup(roleGroup);
         sellerRadioBtn.setToggleGroup(roleGroup);
 
-        container.getChildren().addAll(pageLbl, titleLbl, usernameContainer, passwordContainer, phoneNumberContainer, addressContainer, roleContainer, submitBtn, loginHl);
+        container.getChildren().addAll(pageLbl, titleLbl, usernameContainer, passwordContainer, phoneNumberContainer, addressContainer, roleContainer, errorLbl, submitBtn, loginHl);
         container.setAlignment(Pos.CENTER);
         container.setSpacing(14);
         container.setMaxWidth(600);
@@ -116,7 +119,11 @@ public final class RegisterPage extends Page {
     @Override
     public void setStyle() {
         pageLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 64px; -fx-font-weight: bolder; -fx-font-style: italic");
+        
         titleLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 20px; -fx-font-weight: bold");
+        
+        errorLbl.setTextFill(Color.RED);
+        errorLbl.setVisible(false);
     }
 
     @Override
@@ -126,8 +133,12 @@ public final class RegisterPage extends Page {
         });
 
         loginHl.setOnMouseClicked(e -> {
-            PageManager.changePage(LoginPage.getInstance(), "Login Page");
+            navigateToLogin();
         });
+    }
+    
+    private void navigateToLogin() {
+    	PageManager.changePage(LoginPage.getInstance(), "Login Page");
     }
 
     private void register() {
@@ -138,13 +149,17 @@ public final class RegisterPage extends Page {
         }
 
         Response<User> response = _userController.register(usernameTf.getText(), passwordPf.getText(), phoneNumberTf.getText(), addressTf.getText(), selectedRole);
-
-        if (!response.success) {
-            AlertHelper.showError("Error", response.message);
+        
+        if (!response.isSuccess()) {
+//            AlertHelper.showError("Error", response.message);
+            errorLbl.setText(response.getMessage());
+            errorLbl.setVisible(true);
             return;
         }
 
-        AlertHelper.showInfo("Success", response.message);
+        errorLbl.setText("");
+        errorLbl.setVisible(false);
+        navigateToLogin();
     }
 
     private static RegisterPage instance;
