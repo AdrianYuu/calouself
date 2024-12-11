@@ -1,12 +1,8 @@
 package view;
 
-import config.AppConfig;
 import controller.UserController;
-import interfaces.IComponent;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import lib.manager.PageManager;
@@ -15,11 +11,10 @@ import model.User;
 import utils.AlertHelper;
 import view.base.Page;
 
-public final class RegisterPage extends Page implements IComponent {
+public final class RegisterPage extends Page {
 
-    private UserController _userController;
+    private final UserController _userController;
 
-    private BorderPane mainContainer;
     private VBox container;
 
     private Label pageLbl;
@@ -52,9 +47,10 @@ public final class RegisterPage extends Page implements IComponent {
     
     private Hyperlink loginHl;
 
+    private Hyperlink loginHl;
+
     @Override
     public void init() {
-        mainContainer = new BorderPane();
         container = new VBox();
 
         pageLbl = new Label("CaLouselF");
@@ -84,7 +80,6 @@ public final class RegisterPage extends Page implements IComponent {
         sellerRadioBtn = new RadioButton("Seller");
 
         submitBtn = new Button("Submit");
-        
         loginHl = new Hyperlink("Login");
     }
 
@@ -115,9 +110,7 @@ public final class RegisterPage extends Page implements IComponent {
         container.setSpacing(14);
         container.setMaxWidth(600);
 
-        mainContainer.setCenter(container);
-
-        setScene(new Scene(mainContainer, AppConfig.SCREEN_WIDTH, AppConfig.SCREEN_HEIGHT));
+        this.setCenter(container);
     }
 
     @Override
@@ -129,28 +122,29 @@ public final class RegisterPage extends Page implements IComponent {
     @Override
     public void setEvent() {
         submitBtn.setOnMouseClicked(e -> {
-
-            String selectedRole = "";
-            if (roleGroup.getSelectedToggle() != null) {
-                RadioButton selectedRadioButton = (RadioButton) roleGroup.getSelectedToggle();
-                selectedRole = selectedRadioButton.getText();
-            }
-
-            Response<User> response = _userController.register(usernameTf.getText(), passwordPf.getText(), phoneNumberTf.getText(), addressTf.getText(), selectedRole);
-
-            if (!response.success) {
-                AlertHelper.showError("Error", "Error", response.message);
-                return;
-            }
-            
-
-            AlertHelper.showInfo("Success", "Success", response.message);
+            register();
         });
-        
+
         loginHl.setOnMouseClicked(e -> {
-    		PageManager.setScene(LoginPage.getInstance().getScene());
-    		createOrRefreshPage();
-    	});
+            PageManager.changePage(LoginPage.getInstance(), "Login Page");
+        });
+    }
+
+    private void register() {
+        String selectedRole = "";
+        if (roleGroup.getSelectedToggle() != null) {
+            RadioButton selectedRadioButton = (RadioButton) roleGroup.getSelectedToggle();
+            selectedRole = selectedRadioButton.getText();
+        }
+
+        Response<User> response = _userController.register(usernameTf.getText(), passwordPf.getText(), phoneNumberTf.getText(), addressTf.getText(), selectedRole);
+
+        if (!response.success) {
+            AlertHelper.showError("Error", response.message);
+            return;
+        }
+
+        AlertHelper.showInfo("Success", response.message);
     }
 
     private static RegisterPage instance;
