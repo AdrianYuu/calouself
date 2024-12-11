@@ -3,7 +3,7 @@ package view.component;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 
-public class BuyerNavigationBar extends NavigationBar {
+public final class BuyerNavigationBar extends NavigationBar {
 
     private Menu homeMn;
     private MenuItem homeMi;

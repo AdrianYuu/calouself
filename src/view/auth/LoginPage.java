@@ -14,7 +14,7 @@ import view.base.Page;
 
 public final class LoginPage extends Page {
 
-    private final UserController _userController;
+    private final UserController userController;
 
     private VBox container;
 
@@ -95,7 +95,7 @@ public final class LoginPage extends Page {
     }
 
     private void login() {
-        Response<User> response = _userController.login(usernameTf.getText(), passwordPf.getText());
+        Response<User> response = userController.login(usernameTf.getText(), passwordPf.getText());
 
         if (!response.isSuccess()) {
             errorLbl.setText(response.getMessage());
@@ -119,7 +119,7 @@ public final class LoginPage extends Page {
 
     private LoginPage() {
         createOrRefreshPage();
-        _userController = UserController.getInstance();
+        userController = UserController.getInstance();
     }
 
 }

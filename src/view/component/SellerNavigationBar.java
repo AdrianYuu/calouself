@@ -6,7 +6,7 @@ import lib.manager.PageManager;
 import view.HomePage;
 import view.UploadItemPage;
 
-public class SellerNavigationBar extends NavigationBar {
+public final class SellerNavigationBar extends NavigationBar {
 
     private Menu homeMn;
     private MenuItem homeMi;

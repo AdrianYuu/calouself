@@ -13,7 +13,7 @@ import utils.AlertHelper;
 import view.base.Page;
 import view.component.NavigationBar;
 
-public class UploadItemPage extends Page {
+public final class UploadItemPage extends Page {
 
     private final ItemController itemController;
 

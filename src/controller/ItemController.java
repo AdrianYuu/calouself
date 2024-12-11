@@ -4,7 +4,7 @@ import enums.ItemStatus;
 import lib.response.Response;
 import model.Item;
 
-public class ItemController {
+public final class ItemController {
 
     private static ItemController instance;
 

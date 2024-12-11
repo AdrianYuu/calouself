@@ -21,7 +21,7 @@ public class Item {
     }
 
     public static boolean create(String itemName, String itemSize, Integer itemPrice, String itemCategory, ItemStatus itemStatus) {
-        String query = "INSERT INTO items(item_name, item_size, item_price, item_category, item_status) VALUES(?, ?, ?, ?, ?)";
+        String query = "INSERT INTO items (item_name, item_size, item_price, item_category, item_status) VALUES (?, ?, ?, ?, ?)";
         return Connect.getConnection().executePreparedUpdate(query, itemName, itemSize, itemPrice, itemCategory, itemStatus);
     }
 
