@@ -5,22 +5,18 @@ import lib.response.Response;
 import model.Item;
 
 public class ItemController {
+
     private static ItemController instance;
 
-    private ItemController() {
-
+    public static ItemController getInstance() {
+        return instance = (instance == null) ? new ItemController() : instance;
     }
 
-    public static ItemController getInstance() {
-        if (instance == null) {
-            instance = new ItemController();
-        }
-
-        return instance;
+    private ItemController() {
     }
 
     public Response<Item> uploadItem(String itemName, String itemCategory, String itemSize, String itemPrice) {
-        String message = validateItem(itemName, itemSize, itemPrice,itemCategory);
+        String message = checkItemValidation(itemName, itemCategory, itemSize, itemPrice);
 
         if (!message.isEmpty()) {
             return Response.Failed(message);
@@ -35,8 +31,7 @@ public class ItemController {
         return Response.Success(null);
     }
 
-
-    public String validateItem(String itemName,  String itemSize, String itemPrice, String itemCategory) {
+    private String checkItemValidation(String itemName, String itemCategory, String itemSize, String itemPrice) {
         if (itemName.isBlank()) {
             return "Item name can't be empty.";
         }
@@ -63,15 +58,10 @@ public class ItemController {
 
         try {
             int price = Integer.parseInt(itemPrice);
-
-            if (price == 0) {
-                return "Price cannot be 0.";
-            }
-        }
-        catch (NumberFormatException e) {
+            if (price == 0) return "Price cannot be 0.";
+        } catch (NumberFormatException e) {
             return "Price must be a number.";
         }
-
 
         return "";
     }

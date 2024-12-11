@@ -1,7 +1,7 @@
 package view;
 
 import controller.ItemController;
-import javafx.geometry.Pos;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -11,10 +11,9 @@ import lib.response.Response;
 import model.Item;
 import utils.AlertHelper;
 import view.base.Page;
-import view.component.SellerNavigationBar;
+import view.component.NavigationBar;
 
 public class UploadItemPage extends Page {
-    private static UploadItemPage instance;
 
     private final ItemController itemController;
 
@@ -42,20 +41,9 @@ public class UploadItemPage extends Page {
 
     private Button submitBtn;
 
-    private UploadItemPage() {
-        this.itemController = ItemController.getInstance();
-    }
-
-    public static UploadItemPage getInstance() {
-        if (instance == null) {
-            instance = new UploadItemPage();
-        }
-        return instance;
-    }
-
     @Override
     public void init() {
-        this.setTop(SellerNavigationBar.create());
+        setTop(NavigationBar.getNavigationBar());
 
         container = new VBox();
 
@@ -96,13 +84,13 @@ public class UploadItemPage extends Page {
         itemPriceContainer.getChildren().addAll(itemPriceLbl, itemPriceTf);
         itemPriceContainer.setSpacing(8);
 
-
-        container.getChildren().addAll(pageLbl, itemNameContainer, itemCategoryContainer, itemSizeContainer, itemPriceContainer, errorLbl, submitBtn);
-//        container.setAlignment(Pos.CENTER);
+        container.getChildren().addAll(pageLbl, itemNameContainer, itemCategoryContainer, itemSizeContainer, itemPriceContainer, submitBtn, errorLbl);
         container.setSpacing(14);
         container.setMaxWidth(600);
 
-        this.setCenter(container);
+        setCenter(container);
+
+        container.setPadding(new Insets(20, 0, 0, 0));
     }
 
     @Override
@@ -116,24 +104,38 @@ public class UploadItemPage extends Page {
     @Override
     public void setEvent() {
         submitBtn.setOnMouseClicked(e -> {
-
-            Response<Item> response = itemController.uploadItem(
-                    itemNameTf.getText(),
-                    itemCategoryTf.getText(),
-                    itemSizeTf.getText(),
-                    itemPriceTf.getText()
-            );
-
-            if (!response.isSuccess()) {
-                errorLbl.setText(response.getMessage());
-                errorLbl.setVisible(true);
-                return;
-            }
-
-            errorLbl.setText("");
-            errorLbl.setVisible(false);
-
-            AlertHelper.showInfo("Upload Success", "Your item is uploaded successfully");
+            uploadItem();
         });
+    }
+
+    private void uploadItem() {
+        Response<Item> response = itemController.uploadItem(
+                itemNameTf.getText(),
+                itemCategoryTf.getText(),
+                itemSizeTf.getText(),
+                itemPriceTf.getText()
+        );
+
+        if (!response.isSuccess()) {
+            errorLbl.setText(response.getMessage());
+            errorLbl.setVisible(true);
+            return;
+        }
+
+        errorLbl.setText("");
+        errorLbl.setVisible(false);
+
+        AlertHelper.showInfo("Upload Item Success", "Your item is uploaded successfully.");
+    }
+
+    private static UploadItemPage instance;
+
+    public static UploadItemPage getInstance() {
+        return instance = (instance == null) ? new UploadItemPage() : instance;
+    }
+
+    private UploadItemPage() {
+        createOrRefreshPage();
+        itemController = ItemController.getInstance();
     }
 }

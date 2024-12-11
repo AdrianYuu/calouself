@@ -1,4 +1,4 @@
-package view;
+package view.auth;
 
 import controller.UserController;
 import javafx.geometry.Pos;
@@ -6,8 +6,10 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import lib.manager.PageManager;
+import lib.manager.SessionManager;
 import lib.response.Response;
 import model.User;
+import view.HomePage;
 import view.base.Page;
 
 public final class LoginPage extends Page {
@@ -68,7 +70,7 @@ public final class LoginPage extends Page {
         container.setSpacing(14);
         container.setMaxWidth(600);
 
-        this.setCenter(container);
+        setCenter(container);
     }
 
     @Override
@@ -103,6 +105,8 @@ public final class LoginPage extends Page {
 
         errorLbl.setText("");
         errorLbl.setVisible(false);
+
+        SessionManager.setCurrentUser(response.getData());
 
         PageManager.changePage(HomePage.getInstance(), "Home Page");
     }

@@ -1,4 +1,4 @@
-package view;
+package view.auth;
 
 import controller.UserController;
 import enums.UserRole;
@@ -10,7 +10,7 @@ import javafx.scene.paint.Color;
 import lib.manager.PageManager;
 import lib.response.Response;
 import model.User;
-//import utils.AlertHelper;
+import utils.AlertHelper;
 import view.base.Page;
 
 import java.util.ArrayList;
@@ -52,7 +52,6 @@ public final class RegisterPage extends Page {
 
     private Hyperlink loginHl;
 
-    private ArrayList<UserRole> roleExclusions;
     @Override
     public void init() {
         container = new VBox();
@@ -82,15 +81,10 @@ public final class RegisterPage extends Page {
         roleGroup = new ToggleGroup();
         rolesRadioBtn = new ArrayList<>();
 
-        roleExclusions = new ArrayList<>();
-        roleExclusions.add(UserRole.ADMIN);
-
         for (UserRole role : UserRole.values()) {
-            if (roleExclusions.contains(role)) continue;
-
+            if (role.equals(UserRole.ADMIN)) continue;
             RadioButton btn = new RadioButton(role.toString());
             btn.setToggleGroup(roleGroup);
-
             rolesRadioBtn.add(btn);
         }
 
@@ -125,15 +119,15 @@ public final class RegisterPage extends Page {
         container.setSpacing(14);
         container.setMaxWidth(600);
 
-        this.setCenter(container);
+        setCenter(container);
     }
 
     @Override
     public void setStyle() {
         pageLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 64px; -fx-font-weight: bolder; -fx-font-style: italic");
-        
+
         titleLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 20px; -fx-font-weight: bold");
-        
+
         errorLbl.setTextFill(Color.RED);
         errorLbl.setVisible(false);
     }
@@ -148,9 +142,9 @@ public final class RegisterPage extends Page {
             navigateToLogin();
         });
     }
-    
+
     private void navigateToLogin() {
-    	PageManager.changePage(LoginPage.getInstance(), "Login Page");
+        PageManager.changePage(LoginPage.getInstance(), "Login Page");
     }
 
     private void register() {
@@ -168,15 +162,15 @@ public final class RegisterPage extends Page {
             }
         }
 
-
         Response<User> response = _userController.register(usernameTf.getText(), passwordPf.getText(), phoneNumberTf.getText(), addressTf.getText(), selectedRole);
-        
+
         if (!response.isSuccess()) {
             errorLbl.setText(response.getMessage());
             errorLbl.setVisible(true);
             return;
         }
 
+        AlertHelper.showInfo("Register Success", "Your new account is registered successfully.");
         navigateToLogin();
     }
 

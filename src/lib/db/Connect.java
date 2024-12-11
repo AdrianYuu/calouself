@@ -43,7 +43,7 @@ public final class Connect {
         }
         return rs;
     }
-    
+
     public ResultSet executePreparedQuery(String query, Object... parameters) {
         ResultSet rs = null;
         try {
