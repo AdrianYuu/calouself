@@ -2,6 +2,8 @@ package view.component;
 
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import lib.manager.PageManager;
+import view.UploadItemPage;
 
 public class SellerNavigationBar extends NavigationBar {
 
@@ -31,6 +33,8 @@ public class SellerNavigationBar extends NavigationBar {
 
     @Override
     public void setEvent() {
-
+        uploadItemMi.setOnAction(e -> {
+            PageManager.changePage(UploadItemPage.getInstance(), "Upload Item Page");
+        });
     }
 }
