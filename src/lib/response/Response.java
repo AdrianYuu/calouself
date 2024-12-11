@@ -4,8 +4,7 @@ public class Response<T> {
     private boolean success;
     private String message;
     private T data;
-    
-    
+
     public Response(boolean success, String message, T data) {
 		super();
 		this.success = success;
@@ -36,7 +35,5 @@ public class Response<T> {
 	public T getData() {
 		return data;
 	}
-	
-	
-    
+
 }

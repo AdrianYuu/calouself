@@ -152,14 +152,11 @@ public final class RegisterPage extends Page {
         Response<User> response = _userController.register(usernameTf.getText(), passwordPf.getText(), phoneNumberTf.getText(), addressTf.getText(), selectedRole);
         
         if (!response.isSuccess()) {
-//            AlertHelper.showError("Error", response.message);
             errorLbl.setText(response.getMessage());
             errorLbl.setVisible(true);
             return;
         }
 
-        errorLbl.setText("");
-        errorLbl.setVisible(false);
         navigateToLogin();
     }
 
