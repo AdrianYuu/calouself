@@ -11,6 +11,7 @@ import lib.response.Response;
 import model.User;
 //import utils.AlertHelper;
 import view.base.Page;
+import view.component.SellerNavigationBar;
 
 public final class RegisterPage extends Page {
 
