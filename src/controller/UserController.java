@@ -51,9 +51,7 @@ public final class UserController {
     	
     	if (user == null) {
     		return Response.Failed("User not found.");
-    	}
-    	
-    	else if (!user.getPassword().equals(password)) {
+    	} else if (!user.getPassword().equals(password)) {
     		return Response.Failed("Wrong password.");
     	}
     	

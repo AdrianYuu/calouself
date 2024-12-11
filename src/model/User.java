@@ -52,11 +52,8 @@ public final class User {
     	return null;
     }
 
-
 	public String getPassword() {
 		return password;
 	}
-    
-    
 
 }

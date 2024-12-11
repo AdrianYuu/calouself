@@ -3,6 +3,7 @@ package lib.manager;
 import model.User;
 
 public final class SessionManager {
+
 	private static User currentUser;
 
 	public static User getCurrentUser() {
@@ -12,6 +13,5 @@ public final class SessionManager {
 	public static void setCurrentUser(User currentUser) {
 		SessionManager.currentUser = currentUser;
 	}
-	
-	
+
 }

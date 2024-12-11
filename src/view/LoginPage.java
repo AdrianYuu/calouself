@@ -94,13 +94,14 @@ public final class LoginPage extends Page {
 
     private void login() {
     	Response<User> response = _userController.login(usernameTf.getText(), passwordPf.getText());
-    	System.out.println(response.isSuccess());
+
     	if (!response.isSuccess()) {
     		errorLbl.setText(response.getMessage());
     		errorLbl.setVisible(true);
+            return;
     	}
     	
-//    	PageManager.changePage(RegisterPage.getInstance(), "Home Page");
+    	PageManager.changePage(HomePage.getInstance(), "Home Page");
     }
 
     private static LoginPage instance;

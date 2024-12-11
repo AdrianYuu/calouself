@@ -4,7 +4,7 @@ public final class Migration {
 
     private static void createUsersTable(){
         String query = "CREATE TABLE users (" +
-                            "user_id INT PRIMARY KEY," +
+                            "user_id INT PRIMARY KEY AUTO_INCREMENT," +
                             "username VARCHAR(100)," +
                             "password VARCHAR(100)," +
                             "phone_number VARCHAR(100)," +
