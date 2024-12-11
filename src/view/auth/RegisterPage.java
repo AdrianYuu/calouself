@@ -1,6 +1,7 @@
-package view;
+package view.auth;
 
 import controller.UserController;
+import enums.UserRole;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
@@ -9,9 +10,10 @@ import javafx.scene.paint.Color;
 import lib.manager.PageManager;
 import lib.response.Response;
 import model.User;
-//import utils.AlertHelper;
+import utils.AlertHelper;
 import view.base.Page;
-import view.component.SellerNavigationBar;
+
+import java.util.ArrayList;
 
 public final class RegisterPage extends Page {
 
@@ -42,9 +44,8 @@ public final class RegisterPage extends Page {
     private Label roleLbl;
     private HBox radioContainer;
     private ToggleGroup roleGroup;
-    private RadioButton buyerRadioBtn;
-    private RadioButton sellerRadioBtn;
-    
+    private ArrayList<RadioButton> rolesRadioBtn;
+
     private Label errorLbl;
 
     private Button submitBtn;
@@ -78,9 +79,15 @@ public final class RegisterPage extends Page {
         roleLbl = new Label("Role");
         radioContainer = new HBox();
         roleGroup = new ToggleGroup();
-        buyerRadioBtn = new RadioButton("Buyer");
-        sellerRadioBtn = new RadioButton("Seller");
-        
+        rolesRadioBtn = new ArrayList<>();
+
+        for (UserRole role : UserRole.values()) {
+            if (role.equals(UserRole.ADMIN)) continue;
+            RadioButton btn = new RadioButton(role.toString());
+            btn.setToggleGroup(roleGroup);
+            rolesRadioBtn.add(btn);
+        }
+
         errorLbl = new Label();
 
         submitBtn = new Button("Submit");
@@ -104,25 +111,23 @@ public final class RegisterPage extends Page {
         roleContainer.getChildren().addAll(roleLbl, radioContainer);
         roleContainer.setSpacing(8);
 
-        radioContainer.getChildren().addAll(buyerRadioBtn, sellerRadioBtn);
+        radioContainer.getChildren().addAll(rolesRadioBtn);
         radioContainer.setSpacing(8);
-        buyerRadioBtn.setToggleGroup(roleGroup);
-        sellerRadioBtn.setToggleGroup(roleGroup);
 
         container.getChildren().addAll(pageLbl, titleLbl, usernameContainer, passwordContainer, phoneNumberContainer, addressContainer, roleContainer, errorLbl, submitBtn, loginHl);
         container.setAlignment(Pos.CENTER);
         container.setSpacing(14);
         container.setMaxWidth(600);
 
-        this.setCenter(container);
+        setCenter(container);
     }
 
     @Override
     public void setStyle() {
         pageLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 64px; -fx-font-weight: bolder; -fx-font-style: italic");
-        
+
         titleLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 20px; -fx-font-weight: bold");
-        
+
         errorLbl.setTextFill(Color.RED);
         errorLbl.setVisible(false);
     }
@@ -137,26 +142,35 @@ public final class RegisterPage extends Page {
             navigateToLogin();
         });
     }
-    
+
     private void navigateToLogin() {
-    	PageManager.changePage(LoginPage.getInstance(), "Login Page");
+        PageManager.changePage(LoginPage.getInstance(), "Login Page");
     }
 
     private void register() {
-        String selectedRole = "";
+        UserRole selectedRole = null;
+
         if (roleGroup.getSelectedToggle() != null) {
             RadioButton selectedRadioButton = (RadioButton) roleGroup.getSelectedToggle();
-            selectedRole = selectedRadioButton.getText();
+            String roleString = selectedRadioButton.getText();
+
+            for (UserRole role : UserRole.values()) {
+                if (role.toString().equals(roleString)) {
+                    selectedRole = role;
+                    break;
+                }
+            }
         }
 
         Response<User> response = _userController.register(usernameTf.getText(), passwordPf.getText(), phoneNumberTf.getText(), addressTf.getText(), selectedRole);
-        
+
         if (!response.isSuccess()) {
             errorLbl.setText(response.getMessage());
             errorLbl.setVisible(true);
             return;
         }
 
+        AlertHelper.showInfo("Register Success", "Your new account is registered successfully.");
         navigateToLogin();
     }
 

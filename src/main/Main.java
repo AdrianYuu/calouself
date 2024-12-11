@@ -13,7 +13,7 @@ public final class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        Migration.run();
+//        Migration.run();
         PageManager.initialize(stage);
     }
 

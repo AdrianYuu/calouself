@@ -7,5 +7,6 @@ public final class AppConfig {
 
     public static final double SCREEN_WIDTH = 1200;
     public static final double SCREEN_HEIGHT = 800;
+    public static final String APP_NAME = "CaLouselF";
 
 }

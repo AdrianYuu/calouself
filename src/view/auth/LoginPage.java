@@ -1,4 +1,4 @@
-package view;
+package view.auth;
 
 import controller.UserController;
 import javafx.geometry.Pos;
@@ -6,8 +6,10 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import lib.manager.PageManager;
+import lib.manager.SessionManager;
 import lib.response.Response;
 import model.User;
+import view.HomePage;
 import view.base.Page;
 
 public final class LoginPage extends Page {
@@ -26,7 +28,7 @@ public final class LoginPage extends Page {
     private VBox passwordContainer;
     private Label passwordLbl;
     private PasswordField passwordPf;
-    
+
     private Label errorLbl;
 
     private Button submitBtn;
@@ -47,7 +49,7 @@ public final class LoginPage extends Page {
         passwordContainer = new VBox();
         passwordLbl = new Label("Password");
         passwordPf = new PasswordField();
-        
+
         errorLbl = new Label();
 
         submitBtn = new Button("Submit");
@@ -68,15 +70,15 @@ public final class LoginPage extends Page {
         container.setSpacing(14);
         container.setMaxWidth(600);
 
-        this.setCenter(container);
+        setCenter(container);
     }
 
     @Override
     public void setStyle() {
         pageLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 64px; -fx-font-weight: bolder; -fx-font-style: italic");
-        
+
         titleLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 20px; -fx-font-weight: bold");
-        
+
         errorLbl.setTextFill(Color.RED);
         errorLbl.setVisible(false);
     }
@@ -93,21 +95,26 @@ public final class LoginPage extends Page {
     }
 
     private void login() {
-    	Response<User> response = _userController.login(usernameTf.getText(), passwordPf.getText());
+        Response<User> response = _userController.login(usernameTf.getText(), passwordPf.getText());
 
-    	if (!response.isSuccess()) {
-    		errorLbl.setText(response.getMessage());
-    		errorLbl.setVisible(true);
+        if (!response.isSuccess()) {
+            errorLbl.setText(response.getMessage());
+            errorLbl.setVisible(true);
             return;
-    	}
-    	
-    	PageManager.changePage(HomePage.getInstance(), "Home Page");
+        }
+
+        errorLbl.setText("");
+        errorLbl.setVisible(false);
+
+        SessionManager.setCurrentUser(response.getData());
+
+        PageManager.changePage(HomePage.getInstance(), "Home Page");
     }
 
     private static LoginPage instance;
 
     public static LoginPage getInstance() {
-    	return instance = (instance == null) ? new LoginPage() : instance;
+        return instance = (instance == null) ? new LoginPage() : instance;
     }
 
     private LoginPage() {

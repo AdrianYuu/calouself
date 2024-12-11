@@ -1,13 +1,13 @@
 package view;
 
 import view.base.Page;
-import view.component.SellerNavigationBar;
+import view.component.NavigationBar;
 
 public final class HomePage extends Page {
 
     @Override
     public void init() {
-        this.setTop(SellerNavigationBar.create());
+        setTop(NavigationBar.getNavigationBar());
     }
 
     @Override
@@ -24,6 +24,7 @@ public final class HomePage extends Page {
     public void setEvent() {
 
     }
+
     private static HomePage instance;
 
     public static HomePage getInstance() {
