@@ -2,6 +2,8 @@ package view.component.navbar;
 
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import lib.manager.PageManager;
+import view.admin.RequestPage;
 
 public final class AdminNavigationBar extends NavigationBar {
 
@@ -35,6 +37,7 @@ public final class AdminNavigationBar extends NavigationBar {
     @Override
     public void setEvent() {
         viewRequestedItemMi.setOnAction(e -> {
+            PageManager.changePage(RequestPage.getInstance(), "Request Page");
         });
     }
 

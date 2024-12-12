@@ -20,7 +20,7 @@ public final class ItemCard extends BorderPane implements IComponent {
 
     private final ItemController itemController;
     private final Item item;
-    private final boolean isOwned;
+    private final boolean isOwner;
 
     private VBox container;
 
@@ -45,7 +45,7 @@ public final class ItemCard extends BorderPane implements IComponent {
         btnContainer = new HBox();
         bottomContainer = new HBox();
 
-        if (isOwned) {
+        if (isOwner) {
             editBtn = new Button("Edit");
             deleteBtn = new Button("Delete");
         } else {
@@ -62,7 +62,7 @@ public final class ItemCard extends BorderPane implements IComponent {
         setBottom(bottomContainer);
         bottomContainer.getChildren().addAll(itemPriceLbl, btnContainer);
 
-        if (isOwned) {
+        if (isOwner) {
             btnContainer.getChildren().addAll(editBtn, deleteBtn);
         } else {
             btnContainer.getChildren().add(buyBtn);
@@ -105,13 +105,15 @@ public final class ItemCard extends BorderPane implements IComponent {
 
     @Override
     public void setEvent() {
-        editBtn.setOnMouseClicked(e -> {
-            PageManager.changePage(EditItemPage.getInstance(item), "Edit Item Page");
-        });
+        if (isOwner) {
+            editBtn.setOnMouseClicked(e -> {
+                PageManager.changePage(EditItemPage.getInstance(item), "Edit Item Page");
+            });
 
-        deleteBtn.setOnMouseClicked(e -> {
-            delete();
-        });
+            deleteBtn.setOnMouseClicked(e -> {
+                delete();
+            });
+        }
     }
 
     private void delete() {
@@ -125,7 +127,7 @@ public final class ItemCard extends BorderPane implements IComponent {
 
     public ItemCard(Item item, boolean isOwned) {
         this.item = item;
-        this.isOwned = isOwned;
+        this.isOwner = isOwned;
         this.itemController = ItemController.getInstance();
         init();
         setLayout();
