@@ -1,4 +1,4 @@
-package view;
+package view.seller;
 
 import controller.ItemController;
 import javafx.geometry.Insets;
@@ -11,9 +11,9 @@ import lib.response.Response;
 import model.Item;
 import utils.AlertHelper;
 import view.base.Page;
-import view.component.NavigationBar;
+import view.component.navbar.NavigationBar;
 
-public class UploadItemPage extends Page {
+public final class UploadItemPage extends Page {
 
     private final ItemController itemController;
 
@@ -73,32 +73,27 @@ public class UploadItemPage extends Page {
     @Override
     public void setLayout() {
         itemNameContainer.getChildren().addAll(itemNameLbl, itemNameTf);
-        itemNameContainer.setSpacing(8);
-
         itemCategoryContainer.getChildren().addAll(itemCategoryLbl, itemCategoryTf);
-        itemCategoryContainer.setSpacing(8);
-
         itemSizeContainer.getChildren().addAll(itemSizeLbl, itemSizeTf);
-        itemSizeContainer.setSpacing(8);
-
         itemPriceContainer.getChildren().addAll(itemPriceLbl, itemPriceTf);
-        itemPriceContainer.setSpacing(8);
-
         container.getChildren().addAll(pageLbl, itemNameContainer, itemCategoryContainer, itemSizeContainer, itemPriceContainer, submitBtn, errorLbl);
-        container.setSpacing(14);
-        container.setMaxWidth(600);
-
         setCenter(container);
-
-        container.setPadding(new Insets(20, 0, 0, 0));
     }
 
     @Override
     public void setStyle() {
-        pageLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 20px; -fx-font-weight: bold");
-
+        itemNameContainer.setSpacing(8);
+        itemCategoryContainer.setSpacing(8);
+        itemSizeContainer.setSpacing(8);
+        itemPriceContainer.setSpacing(8);
+        container.setSpacing(14);
+        container.setMaxWidth(600);
+        container.setPadding(new Insets(20, 0, 0, 0));
         errorLbl.setTextFill(Color.RED);
         errorLbl.setVisible(false);
+
+        pageLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 20px; -fx-font-weight: bold");
+
     }
 
     @Override
@@ -111,9 +106,9 @@ public class UploadItemPage extends Page {
     private void uploadItem() {
         Response<Item> response = itemController.uploadItem(
                 itemNameTf.getText(),
-                itemCategoryTf.getText(),
                 itemSizeTf.getText(),
-                itemPriceTf.getText()
+                itemPriceTf.getText(),
+                itemCategoryTf.getText()
         );
 
         if (!response.isSuccess()) {
@@ -126,6 +121,7 @@ public class UploadItemPage extends Page {
         errorLbl.setVisible(false);
 
         AlertHelper.showInfo("Upload Item Success", "Your item is uploaded successfully.");
+        createOrRefreshPage();
     }
 
     private static UploadItemPage instance;

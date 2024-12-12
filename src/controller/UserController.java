@@ -3,6 +3,7 @@ package controller;
 import enums.UserRole;
 import lib.response.Response;
 import model.User;
+import utils.StringHelper;
 
 public final class UserController {
 
@@ -31,7 +32,7 @@ public final class UserController {
         return Response.Success(null);
     }
 
-    public String checkAccountValidation(String username, String password, String phoneNumber, String address, UserRole role) {
+    private String checkAccountValidation(String username, String password, String phoneNumber, String address, UserRole role) {
         if (username.isBlank()) {
             return "Username can't be empty.";
         }
@@ -54,16 +55,7 @@ public final class UserController {
             return "Password must be at least 8 characters.";
         }
 
-        String specialCharacters = "!@#$%^&*";
-        boolean hasSpecialCharacter = false;
-        for (char ch : password.toCharArray()) {
-            if (specialCharacters.indexOf(ch) != -1) {
-                hasSpecialCharacter = true;
-                break;
-            }
-        }
-
-        if (!hasSpecialCharacter) {
+        if (!StringHelper.hasSpecialCharacter(password)) {
             return "Password must include at least one special character (!, @, #, $, %, ^, &, *).";
         }
 
@@ -71,14 +63,13 @@ public final class UserController {
             return "Phone number can't be empty.";
         }
 
-        int firstPlus62Index = phoneNumber.indexOf("+62");
-        int secondPlus62Index = phoneNumber.indexOf("+62", firstPlus62Index + 1);
-        if (secondPlus62Index != -1) {
-            return "Phone number must contain exactly one '+62'.";
-        }
-
         if (!phoneNumber.startsWith("+62")) {
             return "Phone number must start with '+62'.";
+        }
+
+        int secondPlus62Index = phoneNumber.indexOf("+62", phoneNumber.indexOf("+62") + 1);
+        if (secondPlus62Index != -1) {
+            return "Phone number must contain exactly one '+62'.";
         }
 
         String digitsOnly = phoneNumber.substring(3);
@@ -90,11 +81,11 @@ public final class UserController {
             return "Address can't be empty.";
         }
 
-        if (role == null){
+        if (role == null) {
             return "Role can't empty.";
         }
 
-        if (!role.equals(UserRole.BUYER) && !role.equals(UserRole.SELLER)){
+        if (!role.equals(UserRole.BUYER) && !role.equals(UserRole.SELLER)) {
             return "Role must be pick between 'Buyer' or 'Seller'.";
         }
 

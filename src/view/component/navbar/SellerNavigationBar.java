@@ -1,12 +1,12 @@
-package view.component;
+package view.component.navbar;
 
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import lib.manager.PageManager;
 import view.HomePage;
-import view.UploadItemPage;
+import view.seller.UploadItemPage;
 
-public class SellerNavigationBar extends NavigationBar {
+public final class SellerNavigationBar extends NavigationBar {
 
     private Menu homeMn;
     private MenuItem homeMi;

@@ -1,9 +1,9 @@
-package view.component;
+package view.component.navbar;
 
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 
-public class AdminNavigationBar extends NavigationBar {
+public final class AdminNavigationBar extends NavigationBar {
 
     private Menu homeMn;
     private MenuItem homeMi;

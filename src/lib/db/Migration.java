@@ -12,6 +12,9 @@ public final class Migration {
         Connect.getConnection().executeUpdate(query);
     }
 
+    private static void dropOffersTable(){
+    }
+
     private static void createUsersTable(){
         String query = "CREATE TABLE users (" +
                             "user_id INT PRIMARY KEY AUTO_INCREMENT," +
@@ -29,21 +32,29 @@ public final class Migration {
                             "item_id INT PRIMARY KEY AUTO_INCREMENT," +
                             "item_name VARCHAR(100)," +
                             "item_size VARCHAR(100)," +
-                            "item_price INT," +
+                            "item_price VARCHAR(100)," +
                             "item_category VARCHAR(100)," +
-                            "item_status VARCHAR(100)" +
+                            "item_status VARCHAR(100)," +
+                            "seller_id INT," +
+                            "FOREIGN KEY (seller_id) REFERENCES users(user_id)" +
                         ")";
         Connect.getConnection().executeUpdate(query);
     }
 
+    private static void createOffersTable(){
+        String query = "";
+    }
+
     private static void dropTables(){
-        dropUsersTable();
+        dropOffersTable();
         dropItemsTable();
+        dropUsersTable();
     }
 
     private static void createTables(){
         createUsersTable();
         createItemsTable();
+        createOffersTable();
     }
 
     public static void run(){

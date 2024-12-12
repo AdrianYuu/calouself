@@ -1,10 +1,13 @@
 package controller;
 
 import enums.ItemStatus;
+import lib.manager.SessionManager;
 import lib.response.Response;
 import model.Item;
 
-public class ItemController {
+import java.util.List;
+
+public final class ItemController {
 
     private static ItemController instance;
 
@@ -15,14 +18,14 @@ public class ItemController {
     private ItemController() {
     }
 
-    public Response<Item> uploadItem(String itemName, String itemCategory, String itemSize, String itemPrice) {
-        String message = checkItemValidation(itemName, itemCategory, itemSize, itemPrice);
+    public Response<Item> uploadItem(String itemName, String itemSize, String itemPrice, String itemCategory) {
+        String message = checkItemValidation(itemName, itemSize, itemPrice, itemCategory);
 
         if (!message.isEmpty()) {
             return Response.Failed(message);
         }
 
-        boolean isSuccess = Item.create(itemName, itemSize, Integer.parseInt(itemPrice), itemCategory, ItemStatus.PENDING);
+        boolean isSuccess = Item.create(itemName, itemSize, itemPrice, itemCategory, ItemStatus.PENDING, SessionManager.getCurrentUser().getUserId());
 
         if (!isSuccess) {
             return Response.Failed("Failed uploading item.");
@@ -31,21 +34,13 @@ public class ItemController {
         return Response.Success(null);
     }
 
-    private String checkItemValidation(String itemName, String itemCategory, String itemSize, String itemPrice) {
+    private String checkItemValidation(String itemName, String itemSize, String itemPrice, String itemCategory) {
         if (itemName.isBlank()) {
             return "Item name can't be empty.";
         }
 
         if (itemName.length() < 3) {
             return "Item name must be at least 3 characters.";
-        }
-
-        if (itemCategory.isBlank()) {
-            return "Item category can't be empty.";
-        }
-
-        if (itemCategory.length() < 3) {
-            return "Item category must be at least 3 characters.";
         }
 
         if (itemSize.isBlank()) {
@@ -63,6 +58,25 @@ public class ItemController {
             return "Price must be a number.";
         }
 
+        if (itemCategory.isBlank()) {
+            return "Item category can't be empty.";
+        }
+
+        if (itemCategory.length() < 3) {
+            return "Item category must be at least 3 characters.";
+        }
+
         return "";
     }
+
+    public Response<List<Item>> viewItems() {
+        List<Item> items = Item.getAll();
+
+        if (items == null) {
+            return Response.Failed("There is no items.");
+        }
+
+        return Response.Success(items);
+    }
+
 }

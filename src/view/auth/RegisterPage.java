@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 public final class RegisterPage extends Page {
 
-    private final UserController _userController;
+    private final UserController userController;
 
     private VBox container;
 
@@ -97,39 +97,31 @@ public final class RegisterPage extends Page {
     @Override
     public void setLayout() {
         usernameContainer.getChildren().addAll(usernameLbl, usernameTf);
-        usernameContainer.setSpacing(8);
-
         passwordContainer.getChildren().addAll(passwordLbl, passwordPf);
-        passwordContainer.setSpacing(8);
-
         phoneNumberContainer.getChildren().addAll(phoneNumberLbl, phoneNumberTf);
-        phoneNumberContainer.setSpacing(8);
-
         addressContainer.getChildren().addAll(addressLbl, addressTf);
-        addressContainer.setSpacing(8);
-
         roleContainer.getChildren().addAll(roleLbl, radioContainer);
-        roleContainer.setSpacing(8);
-
         radioContainer.getChildren().addAll(rolesRadioBtn);
-        radioContainer.setSpacing(8);
-
         container.getChildren().addAll(pageLbl, titleLbl, usernameContainer, passwordContainer, phoneNumberContainer, addressContainer, roleContainer, errorLbl, submitBtn, loginHl);
-        container.setAlignment(Pos.CENTER);
-        container.setSpacing(14);
-        container.setMaxWidth(600);
-
         setCenter(container);
     }
 
     @Override
     public void setStyle() {
-        pageLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 64px; -fx-font-weight: bolder; -fx-font-style: italic");
-
-        titleLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 20px; -fx-font-weight: bold");
-
+        usernameContainer.setSpacing(8);
+        passwordContainer.setSpacing(8);
+        phoneNumberContainer.setSpacing(8);
+        addressContainer.setSpacing(8);
+        roleContainer.setSpacing(8);
+        radioContainer.setSpacing(8);
+        container.setAlignment(Pos.CENTER);
+        container.setSpacing(14);
+        container.setMaxWidth(600);
         errorLbl.setTextFill(Color.RED);
         errorLbl.setVisible(false);
+
+        pageLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 64px; -fx-font-weight: bolder; -fx-font-style: italic");
+        titleLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 20px; -fx-font-weight: bold");
     }
 
     @Override
@@ -162,7 +154,7 @@ public final class RegisterPage extends Page {
             }
         }
 
-        Response<User> response = _userController.register(usernameTf.getText(), passwordPf.getText(), phoneNumberTf.getText(), addressTf.getText(), selectedRole);
+        Response<User> response = userController.register(usernameTf.getText(), passwordPf.getText(), phoneNumberTf.getText(), addressTf.getText(), selectedRole);
 
         if (!response.isSuccess()) {
             errorLbl.setText(response.getMessage());
@@ -182,7 +174,7 @@ public final class RegisterPage extends Page {
 
     private RegisterPage() {
         createOrRefreshPage();
-        _userController = UserController.getInstance();
+        userController = UserController.getInstance();
     }
 
 }
