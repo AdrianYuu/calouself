@@ -4,6 +4,7 @@ import config.AppConfig;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import view.auth.LoginPage;
 import view.auth.RegisterPage;
 import view.base.Page;
 
@@ -15,9 +16,8 @@ public final class PageManager {
 
     public static void initialize(Stage stage) {
         primaryStage = stage;
-        Image appIcon = new Image(Objects.requireNonNull(PageManager.class.getResource("/assets/app_icon.png")).toExternalForm());
-        primaryStage.getIcons().add(appIcon);
-        primaryStage.setScene(new Scene(RegisterPage.getInstance(), AppConfig.SCREEN_WIDTH, AppConfig.SCREEN_HEIGHT));
+        primaryStage.getIcons().add(new Image(Objects.requireNonNull(PageManager.class.getResource(AppConfig.APP_ICON_URL)).toExternalForm()));
+        primaryStage.setScene(new Scene(LoginPage.getInstance(), AppConfig.SCREEN_WIDTH, AppConfig.SCREEN_HEIGHT));
         primaryStage.setResizable(false);
         primaryStage.setTitle(AppConfig.APP_NAME);
         primaryStage.show();

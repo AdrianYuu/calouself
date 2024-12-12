@@ -26,7 +26,7 @@ public final class User {
 
     public static boolean create(String username, String password, String phoneNumber, String address, UserRole role) {
         String query = "INSERT INTO users (username, password, phone_number, address, role) VALUES (?, ?, ?, ?, ?)";
-        return Connect.getConnection().executePreparedUpdate(query, username, password, phoneNumber, address, role);
+        return Connect.getConnection().executePreparedUpdate(query, username, password, phoneNumber, address, role.name());
     }
 
     public static User getByUsername(String username) {
@@ -58,6 +58,10 @@ public final class User {
 
     public UserRole getRole() {
         return role;
+    }
+
+    public String getUserId() {
+        return userId;
     }
 
 }

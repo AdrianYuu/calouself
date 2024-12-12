@@ -1,9 +1,9 @@
 package lib.response;
 
 public final class Response<T> {
-    private boolean success;
-    private String message;
-    private T data;
+    private final boolean success;
+    private final String message;
+    private final T data;
 
     public Response(boolean success, String message, T data) {
         this.success = success;

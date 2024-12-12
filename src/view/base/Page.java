@@ -10,6 +10,7 @@ public abstract class Page extends BorderPane implements IComponent {
         setLayout();
         setStyle();
         setEvent();
+        this.setStyle("-fx-font-family: 'Arial'");
     }
 
     public Page getPage() {

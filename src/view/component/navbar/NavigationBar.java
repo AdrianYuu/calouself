@@ -1,4 +1,4 @@
-package view.component;
+package view.component.navbar;
 
 import enums.UserRole;
 import interfaces.IComponent;
