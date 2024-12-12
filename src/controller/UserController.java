@@ -32,6 +32,28 @@ public final class UserController {
         return Response.Success(null);
     }
 
+    public Response<User> login(String username, String password) {
+        if (username.isEmpty()) {
+            return Response.Failed("Username can't be empty.");
+        }
+
+        if (password.isEmpty()) {
+            return Response.Failed("Password can't be empty.");
+        }
+
+        User user = User.getByUsername(username);
+
+        if (user == null) {
+            return Response.Failed("User not found.");
+        }
+
+        if (!user.getPassword().equals(password)) {
+            return Response.Failed("Wrong password.");
+        }
+
+        return Response.Success(user);
+    }
+
     private String checkAccountValidation(String username, String password, String phoneNumber, String address, UserRole role) {
         if (username.isBlank()) {
             return "Username can't be empty.";
@@ -91,27 +113,4 @@ public final class UserController {
 
         return "";
     }
-
-    public Response<User> login(String username, String password) {
-        if (username.isEmpty()) {
-            return Response.Failed("Username can't be empty.");
-        }
-
-        if (password.isEmpty()) {
-            return Response.Failed("Password can't be empty.");
-        }
-
-        User user = User.getByUsername(username);
-
-        if (user == null) {
-            return Response.Failed("User not found.");
-        }
-
-        if (!user.getPassword().equals(password)) {
-            return Response.Failed("Wrong password.");
-        }
-
-        return Response.Success(user);
-    }
-
 }

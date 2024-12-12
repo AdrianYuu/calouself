@@ -30,7 +30,7 @@ public final class User {
     }
 
     public static User getByUsername(String username) {
-        String query = "SELECT * FROM users WHERE username = ?";
+        String query = "SELECT * FROM users WHERE username = ? LIMIT 1";
 
         try {
             ResultSet rs = Connect.getConnection().executePreparedQuery(query, username);

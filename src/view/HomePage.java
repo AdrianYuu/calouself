@@ -29,7 +29,7 @@ public final class HomePage extends Page {
 
         Response<List<Item>> response = itemController.viewItems();
 
-        if(response.isSuccess()){
+        if (response.isSuccess()) {
             items = response.getData();
         }
     }
@@ -37,11 +37,8 @@ public final class HomePage extends Page {
     @Override
     public void setLayout() {
         setTop(NavigationBar.getNavigationBar());
-        for(Item item : items){
-            System.out.println(item.getSellerId() + " " + SessionManager.getCurrentUser().getUserId());
+        for (Item item : items)
             itemContainer.getChildren().add((new ItemCard(item, item.getSellerId().equals(SessionManager.getCurrentUser().getUserId()))));
-        }
-        for(Item item : items) itemContainer.getChildren().add((new ItemCard(item, item.getSellerId().equals(SessionManager.getCurrentUser().getUserId()))));
         container.setContent(itemContainer);
         setCenter(container);
     }
