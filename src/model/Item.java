@@ -62,6 +62,47 @@ public class Item {
         return null;
     }
 
+    public static Item getById(String itemId) {
+        String query = "SELECT * FROM items WHERE item_id = ? LIMIT 1";
+
+        try {
+            ResultSet rs = Connect.getConnection().executePreparedQuery(query, itemId);
+
+            if (rs.next()) {
+                return new Item(
+                        String.valueOf(rs.getInt("item_id")),
+                        rs.getString("item_name"),
+                        rs.getString("item_size"),
+                        rs.getString("item_price"),
+                        rs.getString("item_category"),
+                        ItemStatus.valueOf(rs.getString("item_status")),
+                        rs.getString("seller_id")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static boolean update(String itemId, String itemName, String itemSize, String itemPrice, String itemCategory, ItemStatus itemStatus, String sellerId) {
+        String query = "UPDATE items " +
+                "SET item_name = ?, " +
+                "item_size = ?, " +
+                "item_price = ?, " +
+                "item_category = ?, " +
+                "item_status = ?, " +
+                "seller_id = ? " +
+                "WHERE item_id = ?";
+        return Connect.getConnection().executePreparedUpdate(query, itemName, itemSize, itemPrice, itemCategory, itemStatus.name(), sellerId, itemId);
+    }
+
+    public static boolean delete(String itemId) {
+        String query = "DELETE from items WHERE item_id = ?";
+        return Connect.getConnection().executePreparedUpdate(query, itemId);
+    }
+
     public String getItemName() {
         return itemName;
     }
@@ -80,6 +121,14 @@ public class Item {
 
     public String getSellerId() {
         return sellerId;
+    }
+
+    public String getItemId() {
+        return itemId;
+    }
+
+    public ItemStatus getItemStatus() {
+        return itemStatus;
     }
 
 }

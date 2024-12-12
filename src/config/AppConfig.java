@@ -10,9 +10,7 @@ public final class AppConfig {
     public static final Double ITEM_CARD_WIDTH = 340.0;
     public static final Double ITEM_CARD_HEIGHT = 220.0;
 
-
     public static final String APP_NAME = "CaLouselF";
     public static final String APP_ICON_URL = "/assets/app_icon.png";
-
 
 }

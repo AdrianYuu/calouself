@@ -34,6 +34,42 @@ public final class ItemController {
         return Response.Success(null);
     }
 
+    public Response<List<Item>> viewItems() {
+        List<Item> items = Item.getAll();
+
+        if (items == null) {
+            return Response.Failed("There is no items.");
+        }
+
+        return Response.Success(items);
+    }
+
+    public Response<Item> deleteItem(String itemId) {
+        boolean isSuccess = Item.delete(itemId);
+
+        if (!isSuccess) {
+            return Response.Failed("Failed to delete item.");
+        }
+
+        return Response.Success(null);
+    }
+
+    public Response<Item> editItem(String itemId, String itemName, String itemSize, String itemPrice, String itemCategory) {
+        Item item = Item.getById(itemId);
+
+        if (item == null) {
+            return Response.Failed("Item does not exists.");
+        }
+
+        boolean isSuccess = Item.update(itemId, itemName, itemSize, itemPrice, itemCategory, item.getItemStatus(), item.getSellerId());
+
+        if (!isSuccess) {
+            return Response.Failed("Failed to update item.");
+        }
+
+        return Response.Success(null);
+    }
+
     private String checkItemValidation(String itemName, String itemSize, String itemPrice, String itemCategory) {
         if (itemName.isBlank()) {
             return "Item name can't be empty.";
@@ -67,16 +103,6 @@ public final class ItemController {
         }
 
         return "";
-    }
-
-    public Response<List<Item>> viewItems() {
-        List<Item> items = Item.getAll();
-
-        if (items == null) {
-            return Response.Failed("There is no items.");
-        }
-
-        return Response.Success(items);
     }
 
 }

@@ -1,6 +1,7 @@
 package view.component.card;
 
 import config.AppConfig;
+import controller.ItemController;
 import interfaces.IComponent;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -8,10 +9,16 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import lib.manager.PageManager;
+import lib.response.Response;
 import model.Item;
+import utils.AlertHelper;
+import view.HomePage;
+import view.seller.EditItemPage;
 
 public final class ItemCard extends BorderPane implements IComponent {
 
+    private final ItemController itemController;
     private final Item item;
     private final boolean isOwned;
 
@@ -25,6 +32,9 @@ public final class ItemCard extends BorderPane implements IComponent {
     private HBox btnContainer;
     private Button editBtn;
     private Button deleteBtn;
+    private Button buyBtn;
+
+    private HBox bottomContainer;
 
     @Override
     public void init() {
@@ -32,11 +42,14 @@ public final class ItemCard extends BorderPane implements IComponent {
         itemCategoryLbl = new Label(item.getItemCategory());
         itemSizeLbl = new Label(item.getItemSize());
         itemPriceLbl = new Label(item.getItemPrice());
+        btnContainer = new HBox();
+        bottomContainer = new HBox();
 
         if (isOwned) {
-            btnContainer = new HBox();
             editBtn = new Button("Edit");
             deleteBtn = new Button("Delete");
+        } else {
+            buyBtn = new Button("Buy");
         }
 
         container = new VBox();
@@ -44,14 +57,16 @@ public final class ItemCard extends BorderPane implements IComponent {
 
     @Override
     public void setLayout() {
-        container.getChildren().addAll(itemNameLbl, itemCategoryLbl, itemSizeLbl, itemPriceLbl);
+        container.getChildren().addAll(itemNameLbl, itemCategoryLbl, itemSizeLbl);
         setCenter(container);
+        setBottom(bottomContainer);
+        bottomContainer.getChildren().addAll(itemPriceLbl, btnContainer);
 
         if (isOwned) {
-            setBottom(btnContainer);
             btnContainer.getChildren().addAll(editBtn, deleteBtn);
+        } else {
+            btnContainer.getChildren().add(buyBtn);
         }
-
     }
 
     @Override
@@ -67,16 +82,51 @@ public final class ItemCard extends BorderPane implements IComponent {
                         "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2)"
         );
 
-        if (isOwned) btnContainer.setSpacing(8);
+        itemNameLbl.setStyle(
+                "-fx-font-size: 24px; " +
+                        "-fx-font-weight: bolder"
+        );
+
+        itemCategoryLbl.setStyle(
+                "-fx-font-size: 16px;" +
+                        "-fx-text-fill: grey"
+        );
+
+        itemPriceLbl.setStyle(
+                "-fx-font-size: 20px;" +
+                        "-fx-text-fill: green;" +
+                        "-fx-font-weight: bold"
+        );
+
+        container.setSpacing(8);
+        btnContainer.setSpacing(8);
+        bottomContainer.setSpacing(8);
     }
 
     @Override
     public void setEvent() {
+        editBtn.setOnMouseClicked(e -> {
+            PageManager.changePage(EditItemPage.getInstance(item), "Edit Item Page");
+        });
+
+        deleteBtn.setOnMouseClicked(e -> {
+            delete();
+        });
+    }
+
+    private void delete() {
+        boolean isConfirmed = AlertHelper.showConfirmation("Item Deletion", "Are you sure want to delete this item?");
+        if (!isConfirmed) return;
+        Response<Item> response = itemController.deleteItem(item.getItemId());
+        if (!response.isSuccess()) return;
+        AlertHelper.showInfo("Item Deletion", "Item deleted successfully.");
+        HomePage.getInstance().createOrRefreshPage();
     }
 
     public ItemCard(Item item, boolean isOwned) {
         this.item = item;
         this.isOwned = isOwned;
+        this.itemController = ItemController.getInstance();
         init();
         setLayout();
         setStyle();
