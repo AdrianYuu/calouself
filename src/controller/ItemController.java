@@ -25,7 +25,7 @@ public final class ItemController {
             return Response.Failed(message);
         }
 
-        boolean isSuccess = Item.create(itemName, itemSize, itemPrice, itemCategory, ItemStatus.PENDING, SessionManager.getCurrentUser().getUserId());
+        boolean isSuccess = Item.create(itemName, itemSize, Integer.parseInt(itemPrice), itemCategory, ItemStatus.PENDING, SessionManager.getCurrentUser().getUserId());
 
         if (!isSuccess) {
             return Response.Failed("Failed uploading item.");
@@ -44,6 +44,59 @@ public final class ItemController {
         return Response.Success(items);
     }
 
+    public Response<Item> approveItem(String itemId) {
+        Item item = Item.getById(itemId);
+
+        if (item == null) {
+            return Response.Failed("Item not found.");
+        }
+
+        if (item.getItemStatus() == ItemStatus.APPROVED) {
+            return Response.Success(null);
+        }
+
+        boolean isSuccess = Item.update(itemId,
+                item.getItemName(),
+                item.getItemSize(),
+                item.getItemPrice(),
+                item.getItemCategory(),
+                ItemStatus.APPROVED,
+                item.getSellerId()
+        );
+
+        if (!isSuccess) {
+            return Response.Failed("Failed to delete item.");
+        }
+
+        return Response.Success(item);
+    }
+
+    public Response<Item> declineItem(String itemId) {
+        Item item = Item.getById(itemId);
+
+        if (item == null) {
+            return Response.Failed("Item not found.");
+        }
+
+        if (item.getItemStatus() == ItemStatus.DECLINED) {
+            return Response.Success(null);
+        }
+
+        boolean isSuccess = Item.update(itemId,
+                item.getItemName(),
+                item.getItemSize(),
+                item.getItemPrice(),
+                item.getItemCategory(),
+                ItemStatus.DECLINED,
+                item.getSellerId()
+        );
+
+        if (!isSuccess) {
+            return Response.Failed("Failed to delete item.");
+        }
+
+        return Response.Success(item);
+    }
     public Response<Item> deleteItem(String itemId) {
         boolean isSuccess = Item.delete(itemId);
 
@@ -61,7 +114,7 @@ public final class ItemController {
             return Response.Failed("Item does not exists.");
         }
 
-        boolean isSuccess = Item.update(itemId, itemName, itemSize, itemPrice, itemCategory, item.getItemStatus(), item.getSellerId());
+        boolean isSuccess = Item.update(itemId, itemName, itemSize, Integer.parseInt(itemPrice), itemCategory, item.getItemStatus(), item.getSellerId());
 
         if (!isSuccess) {
             return Response.Failed("Failed to update item.");

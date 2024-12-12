@@ -4,4 +4,5 @@ module calouself {
 	requires javafx.graphics;
     requires transitive mysql.connector.java;
     opens main;
+    opens model;
 }

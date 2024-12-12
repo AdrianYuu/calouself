@@ -41,7 +41,7 @@ public final class ItemCard extends BorderPane implements IComponent {
         itemNameLbl = new Label(item.getItemName());
         itemCategoryLbl = new Label(item.getItemCategory());
         itemSizeLbl = new Label(item.getItemSize());
-        itemPriceLbl = new Label(item.getItemPrice());
+        itemPriceLbl = new Label(Integer.toString(item.getItemPrice()));
         btnContainer = new HBox();
         bottomContainer = new HBox();
 

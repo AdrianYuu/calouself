@@ -6,11 +6,11 @@ import controller.ItemController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.util.Callback;
 import lib.response.Response;
 import model.Item;
 import view.base.Page;
@@ -31,16 +31,9 @@ public class RequestPage extends Page {
 
     private TableView itemTV;
 
+
     private RequestPage() {
         itemController = ItemController.getInstance();
-        Response<List<Item>> response = itemController.viewItems();
-
-        if (response.isSuccess()) {
-            items = FXCollections.observableArrayList(response.getData());
-        }
-        else {
-            items = FXCollections.emptyObservableList();
-        }
     }
 
     public static RequestPage getInstance() {
@@ -56,35 +49,106 @@ public class RequestPage extends Page {
 
         pageLbl = new Label("Item Requests");
 
-        itemTV = new TableView();
+        itemTV = new TableView<>();
 
-        TableColumn nameColumn = new TableColumn("Name");
-        TableColumn sizeColumn = new TableColumn("Size");
-        TableColumn priceColumn = new TableColumn("Price");
-        TableColumn categoryColumn = new TableColumn("Category");
-        TableColumn statusColumn = new TableColumn("Status");
-        TableColumn actionsColumn = new TableColumn("Actions");
+        TableColumn<Item, String> nameColumn = new TableColumn<>("Name");
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("itemName"));
 
-        itemTV.getColumns().addAll(nameColumn, sizeColumn, priceColumn, categoryColumn, statusColumn);
+        TableColumn<Item, String> sizeColumn = new TableColumn<>("Size");
+        sizeColumn.setCellValueFactory(new PropertyValueFactory<>("itemSize"));
+
+        TableColumn<Item, Integer> priceColumn = new TableColumn<>("Price");
+        priceColumn.setCellValueFactory(new PropertyValueFactory<>("itemPrice"));
+
+        TableColumn<Item, String> categoryColumn = new TableColumn<>("Category");
+        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("itemCategory"));
+
+        TableColumn<Item, String> statusColumn = new TableColumn<>("Status");
+        statusColumn.setCellValueFactory(new PropertyValueFactory<>("itemStatus"));
+
+        TableColumn<Item, Void> actionsColumn = new TableColumn<>("Actions");
+        actionsColumn.setCellFactory(createActionCellFactory());
+
+        itemTV.getColumns().addAll(nameColumn, sizeColumn, priceColumn, categoryColumn, statusColumn, actionsColumn );
 
         itemTV.setItems(items);
     }
+
+    private Callback<TableColumn<Item, Void>, TableCell<Item, Void>> createActionCellFactory() {
+        return new Callback<>() {
+            @Override
+            public TableCell<Item, Void> call(final TableColumn<Item, Void> param) {
+                return new TableCell<>() {
+
+                    private final Button acceptButton = new Button("Approve");
+                    private final Button declineButton = new Button("Decline");
+                    {
+                        acceptButton.setOnAction(event -> {
+                            Item item = getTableView().getItems().get(getIndex());
+                            itemController.approveItem(item.getItemId());
+                            createOrRefreshPage();
+                        });
+
+                        declineButton.setOnAction(event -> {
+                            Item item = getTableView().getItems().get(getIndex());
+                            itemController.declineItem(item.getItemId());
+                            createOrRefreshPage();
+                        });
+                    }
+
+                    @Override
+                    public void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                        } else {
+                            HBox actionButtons = new HBox(acceptButton, declineButton);
+                            actionButtons.setSpacing(10);
+                            setGraphic(actionButtons);
+                        }
+                    }
+                };
+            }
+        };
+    }
+
 
     @Override
     public void setLayout() {
         setTop(NavigationBar.getNavigationBar());
         container.getChildren().addAll(pageLbl, itemTV);
-        container.setSpacing(6);
+        container.setSpacing(10);
 
         container.setAlignment(Pos.CENTER);
-        container.setMaxWidth(AppConfig.SCREEN_WIDTH * 0.8 );
+        double tableWidth = AppConfig.SCREEN_WIDTH * 0.8;
+        container.setMaxWidth(tableWidth);
+
         setCenter(container);
 
         pageLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 32px; -fx-font-weight: bolder;");
+
+        itemTV.getColumns().forEach(col -> {
+            ((TableColumn)col).setMinWidth(tableWidth / itemTV.getColumns().size());
+        });
+    }
+
+    @Override
+    public void createOrRefreshPage() {
+        Response<List<Item>> response = itemController.viewItems();
+
+        if (response.isSuccess()) {
+            items = FXCollections.observableArrayList(response.getData());
+        }
+        else {
+            items = FXCollections.emptyObservableList();
+        }
+
+        super.createOrRefreshPage();
     }
 
     @Override
     public void setStyle() {
+
     }
 
     @Override
