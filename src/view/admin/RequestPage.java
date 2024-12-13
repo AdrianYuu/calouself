@@ -59,6 +59,8 @@ public class RequestPage extends Page {
         declineTD = new TextInputDialog();
 
         declineTD.setTitle("Decline Reason");
+        declineTD.setContentText("Enter decline reason:");
+        declineTD.setGraphic(null);
 
         TableColumn<Item, String> nameColumn = new TableColumn<>("Name");
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("itemName"));
@@ -87,8 +89,8 @@ public class RequestPage extends Page {
         EventHandler<ActionEvent> event = new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e)
             {
+
                 declineTD.showAndWait();
-                declineTD.setContentText("skibdi");
 
             }
         };
