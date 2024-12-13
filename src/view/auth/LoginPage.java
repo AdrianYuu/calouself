@@ -81,11 +81,11 @@ public final class LoginPage extends Page {
 
     @Override
     public void setEvent() {
-        submitBtn.setOnMouseClicked(e -> {
+        submitBtn.setOnAction(e -> {
             login();
         });
 
-        registerHl.setOnMouseClicked(e -> {
+        registerHl.setOnAction(e -> {
             PageManager.changePage(RegisterPage.getInstance(), "Register Page");
         });
     }

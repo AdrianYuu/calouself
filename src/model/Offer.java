@@ -33,12 +33,12 @@ public final class Offer {
     }
 
     public static List<Offer> getBySellerId(String sellerId) {
-        String query = "SELECT * FROM offers WHERE seller_id = ? WHERE offer_status = ?";
+        String query = "SELECT * FROM offers WHERE seller_id = ?";
 
         List<Offer> offers = new ArrayList<>();
 
 
-        ResultSet rs = Connect.getConnection().executePreparedQuery(query, sellerId, OfferStatus.PENDING);
+        ResultSet rs = Connect.getConnection().executePreparedQuery(query, sellerId);
 
         try {
             while (rs.next()) {
@@ -60,6 +60,33 @@ public final class Offer {
         return offers;
     }
 
+    public static List<Offer> getByItemId(String itemId) {
+        String query = "SELECT * FROM offers WHERE item_id = ?";
+
+        List<Offer> offers = new ArrayList<>();
+
+
+        ResultSet rs = Connect.getConnection().executePreparedQuery(query, itemId);
+
+        try {
+            while (rs.next()) {
+                offers.add(
+                        new Offer(
+                                rs.getString("offer_id"),
+                                rs.getString("item_id"),
+                                rs.getString("buyer_id"),
+                                rs.getInt("offer_price"),
+                                OfferStatus.valueOf(rs.getString("offer_status")),
+                                rs.getString("decline_reason")
+                        )
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return offers;
+    }
     public static Offer getById(String offerId) {
         String query = "SELECT * FROM offers WHERE offer_id = ? LIMIT 1";
 

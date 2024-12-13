@@ -4,6 +4,7 @@ import enums.ItemStatus;
 import lib.manager.SessionManager;
 import lib.response.Response;
 import model.Item;
+import utils.AlertHelper;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -79,6 +80,10 @@ public final class ItemController {
     }
 
     public Response<Item> declineItem(String itemId, String reason) {
+        if (reason.isBlank()) {
+            return Response.Failed("Reason cannot be empty.");
+        }
+
         Item item = Item.getById(itemId);
 
         if (item == null) {

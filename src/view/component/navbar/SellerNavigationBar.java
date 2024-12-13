@@ -22,7 +22,7 @@ public final class SellerNavigationBar extends NavigationBar {
 
         homeMi = new MenuItem("Home");
         uploadItemMi = new MenuItem("Upload Item");
-        viewOfferedItemMi = new MenuItem("View Offered Item");
+        viewOfferedItemMi = new MenuItem("View Item Offers");
     }
 
     @Override

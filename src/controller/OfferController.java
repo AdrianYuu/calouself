@@ -5,6 +5,7 @@ import lib.response.Response;
 import model.Item;
 import model.Offer;
 import model.Transaction;
+import utils.AlertHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,10 @@ public class OfferController {
         List<Item> items = new ArrayList<>();
 
         for (Offer offer : offers) {
+            if (offer.getOfferStatus() != OfferStatus.PENDING) {
+                continue;
+            }
+
             Item item = Item.getById(offer.getItemId());
             if (item != null) {
                 items.add(item);
@@ -27,6 +32,26 @@ public class OfferController {
         }
 
         return Response.Success("Successfully get offered items", items);
+    }
+
+    public Response<Offer> getItemHighestOffer(String itemId) {
+        List<Offer> offers = Offer.getByItemId(itemId);
+
+        Offer highestOffer = null;
+        for (Offer offer : offers) {
+            if (offer.getOfferStatus() != OfferStatus.ACCEPTED) {
+                continue;
+            }
+
+            if (highestOffer == null) {
+                highestOffer = offer;
+            }
+            else if (offer.getOfferPrice() > highestOffer.getOfferPrice()) {
+                highestOffer = offer;
+            }
+        }
+
+        return Response.Success("Successfully get highest offer", highestOffer);
     }
 
     public Response<Offer> acceptOffer(String offerId) {
@@ -60,6 +85,32 @@ public class OfferController {
         return Response.Success("Offer accepted successfully.", null);
     }
 
+    public Response<Offer> createOffer(String itemId, String buyerId, int offerPrice) {
+        if (offerPrice <= 0) {
+            return Response.Failed("Offer price must be a positive number.");
+        }
+
+        Response<Offer> highestOfferResponse = getItemHighestOffer(itemId);
+
+        if (!highestOfferResponse.isSuccess()) {
+            return Response.Failed("Cannot get highest offer, please try again later.");
+        }
+
+        Offer highestOffer = highestOfferResponse.getData();
+
+        if (highestOffer != null && offerPrice <= highestOffer.getOfferPrice()) {
+            return Response.Failed(String.format("Offer price must be higher than %d.", highestOffer.getOfferPrice()));
+        }
+
+        boolean isSuccess = Offer.create(itemId, buyerId, offerPrice, OfferStatus.PENDING);
+
+        if (!isSuccess) {
+            return Response.Failed("Failed creating offer.");
+        }
+
+        return Response.Success("Offer created successfully", null);
+    }
+
     public Response<Offer> declineOffer(String offerId, String declineReason) {
         Offer offer = Offer.getById(offerId);
 
@@ -81,5 +132,15 @@ public class OfferController {
         }
 
         return Response.Success("Offer declined successfully.", null);
+    }
+
+    private static OfferController instance;
+
+    public static OfferController getInstance() {
+        if (instance == null) {
+            instance = new OfferController();
+        }
+
+        return instance;
     }
 }

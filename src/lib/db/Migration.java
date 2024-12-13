@@ -59,8 +59,9 @@ public final class Migration {
                 "buyer_id INT," +
                 "offer_price INT," +
                 "offer_status VARCHAR(100)," +
+                "decline_reason VARCHAR(100)," +
                 "FOREIGN KEY (item_id) REFERENCES items(item_id)," +
-                "FOREIGN KEY (buyer_id) REFERENCES users(user_id)," +
+                "FOREIGN KEY (buyer_id) REFERENCES users(user_id)" +
                 ")";
         Connect.getConnection().executeUpdate(query);
 

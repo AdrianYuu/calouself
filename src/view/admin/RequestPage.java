@@ -19,6 +19,7 @@ import view.base.Page;
 import view.component.navbar.NavigationBar;
 
 import java.util.List;
+import java.util.Optional;
 
 public class RequestPage extends Page {
 
@@ -143,24 +144,19 @@ public class RequestPage extends Page {
                         declineBtn.setOnAction(event -> {
                             Item item = getTableView().getItems().get(getIndex());
 
-                            declineTD.showAndWait();
+                            Optional<String> result = declineTD.showAndWait();
 
-                            String reason = declineTD.getEditor().getText();
+                            result.ifPresent(reason -> {
+                                Response<Item> response = itemController.declineItem(item.getItemId(), reason);
 
-                            if (reason.isBlank()) {
-                                AlertHelper.showError("Invalid Input", "Reason cannot be empty.");
-                                return;
-                            }
+                                if (!response.isSuccess()) {
+                                    AlertHelper.showError("Operation Failed", response.getMessage());
+                                    return;
+                                }
 
-                            Response<Item> response = itemController.declineItem(item.getItemId(), reason);
-
-                            if (!response.isSuccess()) {
-                                AlertHelper.showError("Operation Failed", response.getMessage());
-                                return;
-                            }
-
-                            AlertHelper.showInfo("Item Declined", response.getMessage());
-                            createOrRefreshPage();
+                                AlertHelper.showInfo("Operation Success", response.getMessage());
+                                createOrRefreshPage();
+                            });
                         });
                     }
 
