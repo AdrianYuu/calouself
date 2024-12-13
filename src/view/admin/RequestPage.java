@@ -6,6 +6,8 @@ import controller.ItemController;
 import enums.ItemStatus;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -32,6 +34,8 @@ public class RequestPage extends Page {
 
     private TableView itemTV;
 
+    private TextInputDialog declineTD;
+
 
     private RequestPage() {
         itemController = ItemController.getInstance();
@@ -51,6 +55,10 @@ public class RequestPage extends Page {
         pageLbl = new Label("Item Requests");
 
         itemTV = new TableView<>();
+
+        declineTD = new TextInputDialog();
+
+        declineTD.setTitle("Decline Reason");
 
         TableColumn<Item, String> nameColumn = new TableColumn<>("Name");
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("itemName"));
@@ -76,6 +84,14 @@ public class RequestPage extends Page {
     }
 
     private Callback<TableColumn<Item, Void>, TableCell<Item, Void>> createActionCellFactory() {
+        EventHandler<ActionEvent> event = new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e)
+            {
+                declineTD.showAndWait();
+                declineTD.setContentText("skibdi");
+
+            }
+        };
         return new Callback<>() {
             @Override
             public TableCell<Item, Void> call(final TableColumn<Item, Void> param) {
@@ -90,11 +106,7 @@ public class RequestPage extends Page {
                             createOrRefreshPage();
                         });
 
-                        declineButton.setOnAction(event -> {
-                            Item item = getTableView().getItems().get(getIndex());
-                            itemController.declineItem(item.getItemId());
-                            createOrRefreshPage();
-                        });
+                        declineButton.setOnAction(event);
                     }
 
                     @Override
@@ -132,6 +144,8 @@ public class RequestPage extends Page {
             ((TableColumn)col).setMinWidth(tableWidth / itemTV.getColumns().size());
         });
     }
+
+
 
     @Override
     public void createOrRefreshPage() {
