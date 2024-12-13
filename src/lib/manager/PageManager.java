@@ -5,7 +5,6 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import view.auth.LoginPage;
-import view.auth.RegisterPage;
 import view.base.Page;
 
 import java.util.Objects;

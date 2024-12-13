@@ -1,6 +1,7 @@
 package view;
 
 import controller.ItemController;
+import enums.ItemStatus;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ScrollPane;
@@ -13,6 +14,7 @@ import view.component.card.ItemCard;
 import view.component.navbar.NavigationBar;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class HomePage extends Page {
 
@@ -20,7 +22,6 @@ public final class HomePage extends Page {
     private ScrollPane container;
 
     private FlowPane itemContainer;
-    private List<Item> items;
 
     @Override
     public void init() {
@@ -30,15 +31,15 @@ public final class HomePage extends Page {
         Response<List<Item>> response = itemController.viewItems();
 
         if (response.isSuccess()) {
-            items = response.getData();
+            for (Item item : response.getData())
+                itemContainer.getChildren().add((new ItemCard(item, item.getSellerId().equals(SessionManager.getCurrentUser().getUserId()))));
         }
     }
 
     @Override
     public void setLayout() {
         setTop(NavigationBar.getNavigationBar());
-        for (Item item : items)
-            itemContainer.getChildren().add((new ItemCard(item, item.getSellerId().equals(SessionManager.getCurrentUser().getUserId()))));
+
         container.setContent(itemContainer);
         setCenter(container);
     }

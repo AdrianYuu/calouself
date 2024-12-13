@@ -29,7 +29,7 @@ public final class UserController {
             return Response.Failed("Failed to register user.");
         }
 
-        return Response.Success(null);
+        return Response.Success("Successfully register user.", null);
     }
 
     public Response<User> login(String username, String password) {
@@ -51,7 +51,7 @@ public final class UserController {
             return Response.Failed("Wrong password.");
         }
 
-        return Response.Success(user);
+        return Response.Success("Successfully login.", user);
     }
 
     private String checkAccountValidation(String username, String password, String phoneNumber, String address, UserRole role) {

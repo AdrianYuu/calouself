@@ -29,20 +29,30 @@ public final class ItemController {
         boolean isSuccess = Item.create(itemName, itemSize, Integer.parseInt(itemPrice), itemCategory, ItemStatus.PENDING, SessionManager.getCurrentUser().getUserId());
 
         if (!isSuccess) {
-            return Response.Failed("Failed uploading item.");
+            return Response.Failed("Failed to upload item.");
         }
 
-        return Response.Success(null);
+        return Response.Success("Successfully uploaded item.", null);
     }
 
     public Response<List<Item>> viewItems() {
-        List<Item> items = Item.getAll();
+        List<Item> items = Item.getAll().stream().filter(item -> item.getItemStatus() == ItemStatus.APPROVED).collect(Collectors.toList());
 
-        if (items == null) {
-            return Response.Failed("There is no items.");
+        if (items.isEmpty()) {
+            return Response.Failed("There is no accepted items.");
         }
 
-        return Response.Success(items);
+        return Response.Success("Successfully get accepted items.", items);
+    }
+
+    public Response<List<Item>> viewRequestedItems() {
+        List<Item> items = Item.getAll().stream().filter(item -> item.getItemStatus() == ItemStatus.PENDING).collect(Collectors.toList());
+
+        if (items.isEmpty()) {
+            return Response.Failed("There is no requested items.");
+        }
+
+        return Response.Success("Successfully get requested items.", items);
     }
 
     public Response<List<Item>> viewRequestedItem() {
@@ -62,7 +72,7 @@ public final class ItemController {
         }
 
         if (item.getItemStatus() == ItemStatus.APPROVED) {
-            return Response.Success(null);
+            return Response.Failed("Item status is already approved.");
         }
 
         boolean isSuccess = Item.update(itemId,
@@ -78,7 +88,7 @@ public final class ItemController {
             return Response.Failed("Failed to delete item.");
         }
 
-        return Response.Success(item);
+        return Response.Success("Successfully approve item.", null);
     }
 
     public Response<Item> declineItem(String itemId) {
@@ -89,7 +99,7 @@ public final class ItemController {
         }
 
         if (item.getItemStatus() == ItemStatus.DECLINED) {
-            return Response.Success(null);
+            return Response.Failed("Item status is already declined.");
         }
 
         boolean isSuccess = Item.update(itemId,
@@ -105,8 +115,9 @@ public final class ItemController {
             return Response.Failed("Failed to delete item.");
         }
 
-        return Response.Success(item);
+        return Response.Success("Successfully decline item.", null);
     }
+
     public Response<Item> deleteItem(String itemId) {
         boolean isSuccess = Item.delete(itemId);
 
@@ -114,7 +125,7 @@ public final class ItemController {
             return Response.Failed("Failed to delete item.");
         }
 
-        return Response.Success(null);
+        return Response.Success("Successfully delete item.", null);
     }
 
     public Response<Item> editItem(String itemId, String itemName, String itemSize, String itemPrice, String itemCategory) {
@@ -130,7 +141,7 @@ public final class ItemController {
             return Response.Failed("Failed to update item.");
         }
 
-        return Response.Success(null);
+        return Response.Success("Successfully update item.", null);
     }
 
     private String checkItemValidation(String itemName, String itemSize, String itemPrice, String itemCategory) {
@@ -140,6 +151,14 @@ public final class ItemController {
 
         if (itemName.length() < 3) {
             return "Item name must be at least 3 characters.";
+        }
+
+        if (itemCategory.isBlank()) {
+            return "Item category can't be empty.";
+        }
+
+        if (itemCategory.length() < 3) {
+            return "Item category must be at least 3 characters.";
         }
 
         if (itemSize.isBlank()) {
@@ -155,14 +174,6 @@ public final class ItemController {
             if (price == 0) return "Price cannot be 0.";
         } catch (NumberFormatException e) {
             return "Price must be a number.";
-        }
-
-        if (itemCategory.isBlank()) {
-            return "Item category can't be empty.";
-        }
-
-        if (itemCategory.length() < 3) {
-            return "Item category must be at least 3 characters.";
         }
 
         return "";

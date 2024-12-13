@@ -93,7 +93,6 @@ public final class UploadItemPage extends Page {
         errorLbl.setVisible(false);
 
         pageLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 20px; -fx-font-weight: bold");
-
     }
 
     @Override

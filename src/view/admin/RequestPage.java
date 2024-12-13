@@ -1,13 +1,16 @@
 package view.admin;
 
-import com.mysql.cj.xdevapi.Table;
 import config.AppConfig;
 import controller.ItemController;
 import enums.ItemStatus;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+
+import javafx.geometry.Insets;
+
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -16,14 +19,13 @@ import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import lib.response.Response;
 import model.Item;
+import utils.AlertHelper;
 import view.base.Page;
 import view.component.navbar.NavigationBar;
 
-import java.io.ObjectInputFilter;
 import java.util.List;
 
 public class RequestPage extends Page {
-    private static RequestPage instance;
 
     private final ItemController itemController;
     private ObservableList<Item> items;
@@ -33,28 +35,27 @@ public class RequestPage extends Page {
     private Label pageLbl;
 
     private TableView itemTV;
+    private TableColumn<Item, String> nameColumn;
+    private TableColumn<Item, String> sizeColumn;
+    private TableColumn<Item, Integer> priceColumn;
+    private TableColumn<Item, String> categoryColumn;
+    private TableColumn<Item, String> statusColumn;
+    private TableColumn<Item, Void> actionsColumn;
+
 
     private TextInputDialog declineTD;
 
-
-    private RequestPage() {
-        itemController = ItemController.getInstance();
-    }
-
-    public static RequestPage getInstance() {
-        if (instance == null) {
-            instance = new RequestPage();
-        }
-
-        return instance;
-    }
     @Override
     public void init() {
+        Response<List<Item>> response = itemController.viewRequestedItems();
+        items = response.isSuccess() ? FXCollections.observableArrayList(response.getData()) : FXCollections.emptyObservableList();
+
         container = new VBox();
 
         pageLbl = new Label("Item Requests");
 
         itemTV = new TableView<>();
+
 
         declineTD = new TextInputDialog();
 
@@ -63,26 +64,51 @@ public class RequestPage extends Page {
         declineTD.setGraphic(null);
 
         TableColumn<Item, String> nameColumn = new TableColumn<>("Name");
+
+        nameColumn = new TableColumn<>("Name");
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("itemName"));
 
-        TableColumn<Item, String> sizeColumn = new TableColumn<>("Size");
+        sizeColumn = new TableColumn<>("Size");
         sizeColumn.setCellValueFactory(new PropertyValueFactory<>("itemSize"));
 
-        TableColumn<Item, Integer> priceColumn = new TableColumn<>("Price");
+        priceColumn = new TableColumn<>("Price");
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("itemPrice"));
 
-        TableColumn<Item, String> categoryColumn = new TableColumn<>("Category");
+        categoryColumn = new TableColumn<>("Category");
         categoryColumn.setCellValueFactory(new PropertyValueFactory<>("itemCategory"));
 
-        TableColumn<Item, String> statusColumn = new TableColumn<>("Status");
+        statusColumn = new TableColumn<>("Status");
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("itemStatus"));
 
-        TableColumn<Item, Void> actionsColumn = new TableColumn<>("Actions");
+        actionsColumn = new TableColumn<>("Actions");
         actionsColumn.setCellFactory(createActionCellFactory());
 
-        itemTV.getColumns().addAll(nameColumn, sizeColumn, priceColumn, categoryColumn, statusColumn, actionsColumn );
+        itemTV.getColumns().addAll(nameColumn, sizeColumn, priceColumn, categoryColumn, statusColumn, actionsColumn);
 
         itemTV.setItems(items);
+    }
+
+    @Override
+    public void setLayout() {
+        setTop(NavigationBar.getNavigationBar());
+        container.getChildren().addAll(pageLbl, itemTV);
+        container.setSpacing(14);
+        container.setMaxWidth(AppConfig.SCREEN_WIDTH * 0.8);
+        container.setPadding(new Insets(20, 0, 0, 0));
+        setCenter(container);
+        itemTV.getColumns().forEach(col -> {
+            ((TableColumn<?, ?>) col).setMinWidth(AppConfig.SCREEN_WIDTH * 0.8 / itemTV.getColumns().size());
+        });
+    }
+
+    @Override
+    public void setStyle() {
+        pageLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 32px; -fx-font-weight: bolder;");
+    }
+
+    @Override
+    public void setEvent() {
+
     }
 
     private Callback<TableColumn<Item, Void>, TableCell<Item, Void>> createActionCellFactory() {
@@ -98,15 +124,23 @@ public class RequestPage extends Page {
             @Override
             public TableCell<Item, Void> call(final TableColumn<Item, Void> param) {
                 return new TableCell<>() {
-
                     private final Button acceptButton = new Button("Approve");
                     private final Button declineButton = new Button("Decline");
+
                     {
                         acceptButton.setOnAction(event -> {
                             Item item = getTableView().getItems().get(getIndex());
-                            itemController.approveItem(item.getItemId());
+                            Response<Item> response = itemController.approveItem(item.getItemId());
+
+                            if (!response.isSuccess()) {
+                                AlertHelper.showError("Accept Item", response.getMessage());
+                                return;
+                            }
+
+                            AlertHelper.showInfo("Accept Item", response.getMessage());
                             createOrRefreshPage();
                         });
+
 
                         declineButton.setOnAction(event);
                     }
@@ -127,6 +161,7 @@ public class RequestPage extends Page {
         };
     }
 
+    private static RequestPage instance;
 
     @Override
     public void setLayout() {
@@ -166,11 +201,14 @@ public class RequestPage extends Page {
     @Override
     public void setStyle() {
 
+
+    public static RequestPage getInstance() {
+        return instance = (instance == null) ? new RequestPage() : instance;
     }
 
-    @Override
-    public void setEvent() {
-
+    private RequestPage() {
+        itemController = ItemController.getInstance();
+        createOrRefreshPage();
     }
 
 }
