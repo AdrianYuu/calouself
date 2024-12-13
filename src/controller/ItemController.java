@@ -6,6 +6,7 @@ import lib.response.Response;
 import model.Item;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class ItemController {
 
@@ -35,13 +36,23 @@ public final class ItemController {
     }
 
     public Response<List<Item>> viewItems() {
-        List<Item> items = Item.getAll();
+        List<Item> items = Item.getAll().stream().filter(item -> item.getItemStatus() == ItemStatus.APPROVED).collect(Collectors.toList());
 
         if (items.isEmpty()) {
-            return Response.Failed("There is no items.");
+            return Response.Failed("There is no accepted items.");
         }
 
-        return Response.Success("Successfully get items.", items);
+        return Response.Success("Successfully get accepted items.", items);
+    }
+
+    public Response<List<Item>> viewRequestedItems() {
+        List<Item> items = Item.getAll().stream().filter(item -> item.getItemStatus() == ItemStatus.PENDING).collect(Collectors.toList());
+
+        if (items.isEmpty()) {
+            return Response.Failed("There is no requested items.");
+        }
+
+        return Response.Success("Successfully get requested items.", items);
     }
 
     public Response<Item> approveItem(String itemId) {

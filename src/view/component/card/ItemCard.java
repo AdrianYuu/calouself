@@ -1,6 +1,5 @@
 package view.component.card;
 
-import com.mysql.cj.Session;
 import config.AppConfig;
 import controller.ItemController;
 import controller.TransactionController;
