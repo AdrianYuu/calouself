@@ -38,7 +38,7 @@ public class RequestPage extends Page {
 
     @Override
     public void init() {
-        Response<List<Item>> response = itemController.viewItems();
+        Response<List<Item>> response = itemController.viewRequestedItems();
         items = response.isSuccess() ? FXCollections.observableArrayList(response.getData()) : FXCollections.emptyObservableList();
 
         container = new VBox();

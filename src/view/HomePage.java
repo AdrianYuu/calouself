@@ -29,10 +29,9 @@ public final class HomePage extends Page {
         itemContainer = new FlowPane();
 
         Response<List<Item>> response = itemController.viewItems();
-        List<Item> items = response.getData().stream().filter(item -> item.getItemStatus() == ItemStatus.APPROVED).collect(Collectors.toList());
 
         if (response.isSuccess()) {
-            for (Item item : items)
+            for (Item item : response.getData())
                 itemContainer.getChildren().add((new ItemCard(item, item.getSellerId().equals(SessionManager.getCurrentUser().getUserId()))));
         }
     }
