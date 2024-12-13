@@ -32,7 +32,7 @@ public final class ItemController {
             return Response.Failed("Failed to upload item.");
         }
 
-        return Response.Success("Successfully uploaded item.", null);
+        return Response.Success("Item uploaded successfully.", null);
     }
 
     public Response<List<Item>> viewItems() {
@@ -88,7 +88,7 @@ public final class ItemController {
             return Response.Failed("Failed to delete item.");
         }
 
-        return Response.Success("Successfully approve item.", null);
+        return Response.Success("Item approved successfully.", null);
     }
 
     public Response<Item> declineItem(String itemId) {
@@ -115,7 +115,7 @@ public final class ItemController {
             return Response.Failed("Failed to delete item.");
         }
 
-        return Response.Success("Successfully decline item.", null);
+        return Response.Success("Item declined successfully.", null);
     }
 
     public Response<Item> deleteItem(String itemId) {
@@ -125,7 +125,7 @@ public final class ItemController {
             return Response.Failed("Failed to delete item.");
         }
 
-        return Response.Success("Successfully delete item.", null);
+        return Response.Success("Item deleted successfully.", null);
     }
 
     public Response<Item> editItem(String itemId, String itemName, String itemSize, String itemPrice, String itemCategory) {
@@ -141,7 +141,7 @@ public final class ItemController {
             return Response.Failed("Failed to update item.");
         }
 
-        return Response.Success("Successfully update item.", null);
+        return Response.Success("Item updated successfully.", null);
     }
 
     private String checkItemValidation(String itemName, String itemSize, String itemPrice, String itemCategory) {
