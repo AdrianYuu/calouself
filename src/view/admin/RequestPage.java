@@ -43,7 +43,13 @@ public class RequestPage extends Page {
     @Override
     public void init() {
         Response<List<Item>> response = itemController.viewRequestedItems();
-        items = response.isSuccess() ? FXCollections.observableArrayList(response.getData()) : FXCollections.emptyObservableList();
+
+        if (response.isSuccess()) {
+            items = FXCollections.observableArrayList(response.getData());
+        }
+        else {
+            items = FXCollections.emptyObservableList();
+        }
 
         container = new VBox();
 
@@ -51,11 +57,11 @@ public class RequestPage extends Page {
 
         itemTV = new TableView<>();
 
-
         declineTD = new TextInputDialog();
 
         declineTD.setTitle("Decline Reason");
         declineTD.setContentText("Enter decline reason:");
+        declineTD.setHeaderText("");
         declineTD.setGraphic(null);
 
         TableColumn<Item, String> nameColumn = new TableColumn<>("Name");
@@ -81,6 +87,8 @@ public class RequestPage extends Page {
         itemTV.getColumns().addAll(nameColumn, sizeColumn, priceColumn, categoryColumn, statusColumn, actionsColumn);
 
         itemTV.setItems(items);
+
+
     }
 
     @Override
@@ -144,7 +152,7 @@ public class RequestPage extends Page {
                                 return;
                             }
 
-                            Response<Item> response = itemController.declineItem(item.getItemId());
+                            Response<Item> response = itemController.declineItem(item.getItemId(), reason);
 
                             if (!response.isSuccess()) {
                                 AlertHelper.showError("Operation Failed", response.getMessage());
@@ -173,24 +181,6 @@ public class RequestPage extends Page {
     }
 
     private static RequestPage instance;
-
-
-
-    @Override
-    public void createOrRefreshPage() {
-        Response<List<Item>> response = itemController.viewRequestedItem();
-
-        if (response.isSuccess()) {
-            items = FXCollections.observableArrayList(response.getData());
-        }
-        else {
-            items = FXCollections.emptyObservableList();
-        }
-
-        super.createOrRefreshPage();
-    }
-
-
 
     public static RequestPage getInstance() {
         return instance = (instance == null) ? new RequestPage() : instance;
