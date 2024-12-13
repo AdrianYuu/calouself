@@ -12,52 +12,87 @@ public final class Migration {
         Connect.getConnection().executeUpdate(query);
     }
 
-    private static void dropOffersTable(){
+    private static void dropOffersTable() {
     }
 
-    private static void createUsersTable(){
+    private static void dropTransactionsTable() {
+        String query = "DROP TABLE IF EXISTS transactions";
+        Connect.getConnection().executeUpdate(query);
+    }
+
+    private static void dropWishlistsTable() {
+        String query = "DROP TABLE IF EXISTS wishlists";
+        Connect.getConnection().executeUpdate(query);
+    }
+
+    private static void createUsersTable() {
         String query = "CREATE TABLE users (" +
-                            "user_id INT PRIMARY KEY AUTO_INCREMENT," +
-                            "username VARCHAR(100)," +
-                            "password VARCHAR(100)," +
-                            "phone_number VARCHAR(100)," +
-                            "address VARCHAR(100)," +
-                            "role VARCHAR(100)" +
-                        ")";
+                "user_id INT PRIMARY KEY AUTO_INCREMENT," +
+                "username VARCHAR(100)," +
+                "password VARCHAR(100)," +
+                "phone_number VARCHAR(100)," +
+                "address VARCHAR(100)," +
+                "role VARCHAR(100)" +
+                ")";
         Connect.getConnection().executeUpdate(query);
     }
 
-    private static void createItemsTable(){
+    private static void createItemsTable() {
         String query = "CREATE TABLE items (" +
-                            "item_id INT PRIMARY KEY AUTO_INCREMENT," +
-                            "item_name VARCHAR(100)," +
-                            "item_size VARCHAR(100)," +
-                            "item_price VARCHAR(100)," +
-                            "item_category VARCHAR(100)," +
-                            "item_status VARCHAR(100)," +
-                            "seller_id INT," +
-                            "FOREIGN KEY (seller_id) REFERENCES users(user_id)" +
-                        ")";
+                "item_id INT PRIMARY KEY AUTO_INCREMENT," +
+                "item_name VARCHAR(100)," +
+                "item_size VARCHAR(100)," +
+                "item_price VARCHAR(100)," +
+                "item_category VARCHAR(100)," +
+                "item_status VARCHAR(100)," +
+                "seller_id INT," +
+                "FOREIGN KEY (seller_id) REFERENCES users(user_id)" +
+                ")";
         Connect.getConnection().executeUpdate(query);
     }
 
-    private static void createOffersTable(){
-        String query = "";
+    private static void createOffersTable() {
     }
 
-    private static void dropTables(){
+    private static void createTransactionsTable() {
+        String query = "CREATE TABLE transactions (" +
+                "transaction_id INT PRIMARY KEY AUTO_INCREMENT," +
+                "user_id INT," +
+                "item_id INT," +
+                "FOREIGN KEY (user_id) REFERENCES users(user_id)," +
+                "FOREIGN KEY (item_id) REFERENCES items(item_id)" +
+                ")";
+        Connect.getConnection().executeUpdate(query);
+    }
+
+    private static void createWishlistsTable() {
+        String query = "CREATE TABLE wishlists (" +
+                    "wishlist_id INT PRIMARY KEY AUTO_INCREMENT," +
+                    "user_id INT," +
+                    "item_id INT," +
+                    "FOREIGN KEY (user_id) REFERENCES users(user_id)," +
+                    "FOREIGN KEY (item_id) REFERENCES items(item_id)" +
+                    ")";
+        Connect.getConnection().executeUpdate(query);
+    }
+
+    private static void dropTables() {
+        dropWishlistsTable();
+        dropTransactionsTable();
         dropOffersTable();
         dropItemsTable();
         dropUsersTable();
     }
 
-    private static void createTables(){
+    private static void createTables() {
         createUsersTable();
         createItemsTable();
         createOffersTable();
+        createTransactionsTable();
+        createWishlistsTable();
     }
 
-    public static void run(){
+    public static void run() {
         dropTables();
         createTables();
     }

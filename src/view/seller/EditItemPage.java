@@ -66,7 +66,7 @@ public final class EditItemPage extends Page {
 
         itemPriceContainer = new VBox();
         itemPriceLbl = new Label("Item price");
-        itemPriceTf = new TextField(item.getItemPrice());
+        itemPriceTf = new TextField(Integer.toString(item.getItemPrice()));
 
         errorLbl = new Label();
 

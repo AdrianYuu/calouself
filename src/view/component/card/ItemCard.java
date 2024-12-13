@@ -1,7 +1,10 @@
 package view.component.card;
 
+import com.mysql.cj.Session;
 import config.AppConfig;
 import controller.ItemController;
+import controller.TransactionController;
+import enums.UserRole;
 import interfaces.IComponent;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -10,8 +13,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import lib.manager.PageManager;
+import lib.manager.SessionManager;
 import lib.response.Response;
 import model.Item;
+import model.Transaction;
 import utils.AlertHelper;
 import view.HomePage;
 import view.seller.EditItemPage;
@@ -19,8 +24,10 @@ import view.seller.EditItemPage;
 public final class ItemCard extends BorderPane implements IComponent {
 
     private final ItemController itemController;
+    private final TransactionController transactionController;
+
     private final Item item;
-    private final boolean isOwned;
+    private final boolean isOwner;
 
     private VBox container;
 
@@ -41,14 +48,14 @@ public final class ItemCard extends BorderPane implements IComponent {
         itemNameLbl = new Label(item.getItemName());
         itemCategoryLbl = new Label(item.getItemCategory());
         itemSizeLbl = new Label(item.getItemSize());
-        itemPriceLbl = new Label(item.getItemPrice());
+        itemPriceLbl = new Label(Integer.toString(item.getItemPrice()));
         btnContainer = new HBox();
         bottomContainer = new HBox();
 
-        if (isOwned) {
+        if (isOwner) {
             editBtn = new Button("Edit");
             deleteBtn = new Button("Delete");
-        } else {
+        } else if (SessionManager.getCurrentUser().getRole() != UserRole.ADMIN) {
             buyBtn = new Button("Buy");
         }
 
@@ -62,9 +69,9 @@ public final class ItemCard extends BorderPane implements IComponent {
         setBottom(bottomContainer);
         bottomContainer.getChildren().addAll(itemPriceLbl, btnContainer);
 
-        if (isOwned) {
+        if (isOwner) {
             btnContainer.getChildren().addAll(editBtn, deleteBtn);
-        } else {
+        } else if (SessionManager.getCurrentUser().getRole() != UserRole.ADMIN) {
             btnContainer.getChildren().add(buyBtn);
         }
     }
@@ -105,28 +112,49 @@ public final class ItemCard extends BorderPane implements IComponent {
 
     @Override
     public void setEvent() {
-        editBtn.setOnMouseClicked(e -> {
-            PageManager.changePage(EditItemPage.getInstance(item), "Edit Item Page");
-        });
+        if (isOwner) {
+            editBtn.setOnMouseClicked(e -> {
+                PageManager.changePage(EditItemPage.getInstance(item), "Edit Item Page");
+            });
 
-        deleteBtn.setOnMouseClicked(e -> {
-            delete();
-        });
+            deleteBtn.setOnMouseClicked(e -> {
+                delete();
+            });
+        } else if (SessionManager.getCurrentUser().getRole() != UserRole.ADMIN) {
+            buyBtn.setOnMouseClicked(e -> {
+                buy();
+            });
+        }
     }
 
     private void delete() {
         boolean isConfirmed = AlertHelper.showConfirmation("Item Deletion", "Are you sure want to delete this item?");
         if (!isConfirmed) return;
         Response<Item> response = itemController.deleteItem(item.getItemId());
-        if (!response.isSuccess()) return;
-        AlertHelper.showInfo("Item Deletion", "Item deleted successfully.");
+        if (!response.isSuccess()) {
+            AlertHelper.showError("Item Deletion", response.getMessage());
+            return;
+        }
+        AlertHelper.showInfo("Item Deletion", response.getMessage());
         HomePage.getInstance().createOrRefreshPage();
+    }
+
+    private void buy() {
+        boolean isConfirmed = AlertHelper.showConfirmation("Item Buy", "Are you sure want to buy this item?");
+        if (!isConfirmed) return;
+        Response<Transaction> response = transactionController.purchaseItem(SessionManager.getCurrentUser().getUserId(), item.getItemId());
+        if (!response.isSuccess()) {
+            AlertHelper.showError("Item Buy", response.getMessage());
+            return;
+        }
+        AlertHelper.showInfo("Item Buy", response.getMessage());
     }
 
     public ItemCard(Item item, boolean isOwned) {
         this.item = item;
-        this.isOwned = isOwned;
+        this.isOwner = isOwned;
         this.itemController = ItemController.getInstance();
+        this.transactionController = TransactionController.getInstance();
         init();
         setLayout();
         setStyle();
