@@ -2,9 +2,15 @@ package view.admin;
 
 import config.AppConfig;
 import controller.ItemController;
+import enums.ItemStatus;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+
 import javafx.geometry.Insets;
+
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -36,6 +42,9 @@ public class RequestPage extends Page {
     private TableColumn<Item, String> statusColumn;
     private TableColumn<Item, Void> actionsColumn;
 
+
+    private TextInputDialog declineTD;
+
     @Override
     public void init() {
         Response<List<Item>> response = itemController.viewRequestedItems();
@@ -46,6 +55,15 @@ public class RequestPage extends Page {
         pageLbl = new Label("Item Requests");
 
         itemTV = new TableView<>();
+
+
+        declineTD = new TextInputDialog();
+
+        declineTD.setTitle("Decline Reason");
+        declineTD.setContentText("Enter decline reason:");
+        declineTD.setGraphic(null);
+
+        TableColumn<Item, String> nameColumn = new TableColumn<>("Name");
 
         nameColumn = new TableColumn<>("Name");
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("itemName"));
@@ -94,6 +112,14 @@ public class RequestPage extends Page {
     }
 
     private Callback<TableColumn<Item, Void>, TableCell<Item, Void>> createActionCellFactory() {
+        EventHandler<ActionEvent> event = new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e)
+            {
+
+                declineTD.showAndWait();
+
+            }
+        };
         return new Callback<>() {
             @Override
             public TableCell<Item, Void> call(final TableColumn<Item, Void> param) {
@@ -115,18 +141,8 @@ public class RequestPage extends Page {
                             createOrRefreshPage();
                         });
 
-                        declineButton.setOnAction(event -> {
-                            Item item = getTableView().getItems().get(getIndex());
-                            Response<Item> response = itemController.declineItem(item.getItemId());
 
-                            if (!response.isSuccess()) {
-                                AlertHelper.showError("Decline Item", response.getMessage());
-                                return;
-                            }
-
-                            AlertHelper.showInfo("Decline Item", response.getMessage());
-                            createOrRefreshPage();
-                        });
+                        declineButton.setOnAction(event);
                     }
 
                     @Override
@@ -146,6 +162,45 @@ public class RequestPage extends Page {
     }
 
     private static RequestPage instance;
+
+    @Override
+    public void setLayout() {
+        setTop(NavigationBar.getNavigationBar());
+        container.getChildren().addAll(pageLbl, itemTV);
+        container.setSpacing(10);
+
+        container.setAlignment(Pos.CENTER);
+        double tableWidth = AppConfig.SCREEN_WIDTH * 0.8;
+        container.setMaxWidth(tableWidth);
+
+        setCenter(container);
+
+        pageLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 32px; -fx-font-weight: bolder;");
+
+        itemTV.getColumns().forEach(col -> {
+            ((TableColumn)col).setMinWidth(tableWidth / itemTV.getColumns().size());
+        });
+    }
+
+
+
+    @Override
+    public void createOrRefreshPage() {
+        Response<List<Item>> response = itemController.viewRequestedItem();
+
+        if (response.isSuccess()) {
+            items = FXCollections.observableArrayList(response.getData());
+        }
+        else {
+            items = FXCollections.emptyObservableList();
+        }
+
+        super.createOrRefreshPage();
+    }
+
+    @Override
+    public void setStyle() {
+
 
     public static RequestPage getInstance() {
         return instance = (instance == null) ? new RequestPage() : instance;

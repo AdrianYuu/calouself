@@ -55,6 +55,15 @@ public final class ItemController {
         return Response.Success("Successfully get requested items.", items);
     }
 
+    public Response<List<Item>> viewRequestedItem() {
+        List<Item> items = Item.getAll();
+
+        if (items == null) {
+            return Response.Failed("There is no items.");
+        }
+
+        return Response.Success(items.stream().filter(item -> item.getItemStatus() == ItemStatus.PENDING ).collect(Collectors.toList()));
+    }
     public Response<Item> approveItem(String itemId) {
         Item item = Item.getById(itemId);
 
