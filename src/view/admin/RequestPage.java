@@ -3,6 +3,7 @@ package view.admin;
 import com.mysql.cj.xdevapi.Table;
 import config.AppConfig;
 import controller.ItemController;
+import enums.ItemStatus;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
@@ -134,7 +135,7 @@ public class RequestPage extends Page {
 
     @Override
     public void createOrRefreshPage() {
-        Response<List<Item>> response = itemController.viewItems();
+        Response<List<Item>> response = itemController.viewRequestedItem();
 
         if (response.isSuccess()) {
             items = FXCollections.observableArrayList(response.getData());

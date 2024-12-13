@@ -6,6 +6,7 @@ import lib.response.Response;
 import model.Item;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class ItemController {
 
@@ -44,6 +45,15 @@ public final class ItemController {
         return Response.Success(items);
     }
 
+    public Response<List<Item>> viewRequestedItem() {
+        List<Item> items = Item.getAll();
+
+        if (items == null) {
+            return Response.Failed("There is no items.");
+        }
+
+        return Response.Success(items.stream().filter(item -> item.getItemStatus() == ItemStatus.PENDING ).collect(Collectors.toList()));
+    }
     public Response<Item> approveItem(String itemId) {
         Item item = Item.getById(itemId);
 
