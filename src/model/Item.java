@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Item {
+public final class Item {
     private String itemId;
     private String itemName;
     private String itemSize;
@@ -35,11 +35,10 @@ public class Item {
     public static List<Item> getAll() {
         String query = "SELECT * FROM items";
 
+        List<Item> items = new ArrayList<>();
+
         try {
             ResultSet rs = Connect.getConnection().executePreparedQuery(query);
-
-            List<Item> items = new ArrayList<>();
-
             while (rs.next()) {
                 items.add(
                         new Item(
@@ -53,13 +52,11 @@ public class Item {
                         )
                 );
             }
-
-            return items;
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return null;
+        return items;
     }
 
     public static Item getById(String itemId) {
@@ -103,6 +100,10 @@ public class Item {
         return Connect.getConnection().executePreparedUpdate(query, itemId);
     }
 
+    public String getItemId() {
+        return itemId;
+    }
+
     public String getItemName() {
         return itemName;
     }
@@ -119,16 +120,12 @@ public class Item {
         return itemCategory;
     }
 
-    public String getSellerId() {
-        return sellerId;
-    }
-
-    public String getItemId() {
-        return itemId;
-    }
-
     public ItemStatus getItemStatus() {
         return itemStatus;
+    }
+
+    public String getSellerId() {
+        return sellerId;
     }
 
 }

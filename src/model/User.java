@@ -52,16 +52,28 @@ public final class User {
         return null;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
     public String getPassword() {
         return password;
     }
 
-    public UserRole getRole() {
-        return role;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getAddress() {
+        return address;
+    }
+
+    public UserRole getRole() {
+        return role;
     }
 
 }

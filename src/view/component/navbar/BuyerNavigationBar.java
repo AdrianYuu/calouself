@@ -2,6 +2,8 @@ package view.component.navbar;
 
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import lib.manager.PageManager;
+import view.HomePage;
 
 public final class BuyerNavigationBar extends NavigationBar {
 
@@ -40,6 +42,10 @@ public final class BuyerNavigationBar extends NavigationBar {
 
     @Override
     public void setEvent() {
+        homeMi.setOnAction(e -> {
+            PageManager.changePage(HomePage.getInstance(), "Home Page");
+        });
+
         viewWishlistMi.setOnAction(e -> {
         });
     }
