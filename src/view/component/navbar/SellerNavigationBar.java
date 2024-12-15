@@ -4,6 +4,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import lib.manager.PageManager;
 import view.HomePage;
+import view.seller.ItemOffersPage;
 import view.seller.UploadItemPage;
 
 public final class SellerNavigationBar extends NavigationBar {
@@ -13,7 +14,7 @@ public final class SellerNavigationBar extends NavigationBar {
 
     private Menu itemMn;
     private MenuItem uploadItemMi;
-    private MenuItem viewOfferedItemMi;
+    private MenuItem viewItemOffers;
 
     @Override
     public void init() {
@@ -22,13 +23,13 @@ public final class SellerNavigationBar extends NavigationBar {
 
         homeMi = new MenuItem("Home");
         uploadItemMi = new MenuItem("Upload Item");
-        viewOfferedItemMi = new MenuItem("View Offered Item");
+        viewItemOffers = new MenuItem("View Item Offers");
     }
 
     @Override
     public void setLayout() {
         homeMn.getItems().add(homeMi);
-        itemMn.getItems().addAll(uploadItemMi, viewOfferedItemMi);
+        itemMn.getItems().addAll(uploadItemMi, viewItemOffers);
         getMenus().addAll(homeMn, itemMn);
     }
 
@@ -47,7 +48,8 @@ public final class SellerNavigationBar extends NavigationBar {
             PageManager.changePage(UploadItemPage.getInstance(), "Upload Item Page");
         });
 
-        viewOfferedItemMi.setOnAction(e -> {
+        viewItemOffers.setOnAction(e -> {
+            PageManager.changePage(ItemOffersPage.getInstance(), "Item Offers Page");
         });
     }
 

@@ -2,16 +2,11 @@ package view.admin;
 
 import config.AppConfig;
 import controller.ItemController;
-import enums.ItemStatus;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-
 import javafx.geometry.Insets;
 
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
@@ -24,6 +19,7 @@ import view.base.Page;
 import view.component.navbar.NavigationBar;
 
 import java.util.List;
+import java.util.Optional;
 
 public class RequestPage extends Page {
 
@@ -48,7 +44,13 @@ public class RequestPage extends Page {
     @Override
     public void init() {
         Response<List<Item>> response = itemController.viewRequestedItems();
-        items = response.isSuccess() ? FXCollections.observableArrayList(response.getData()) : FXCollections.emptyObservableList();
+
+        if (response.isSuccess()) {
+            items = FXCollections.observableArrayList(response.getData());
+        }
+        else {
+            items = FXCollections.emptyObservableList();
+        }
 
         container = new VBox();
 
@@ -56,11 +58,11 @@ public class RequestPage extends Page {
 
         itemTV = new TableView<>();
 
-
         declineTD = new TextInputDialog();
 
         declineTD.setTitle("Decline Reason");
         declineTD.setContentText("Enter decline reason:");
+        declineTD.setHeaderText("");
         declineTD.setGraphic(null);
 
         TableColumn<Item, String> nameColumn = new TableColumn<>("Name");
@@ -86,6 +88,8 @@ public class RequestPage extends Page {
         itemTV.getColumns().addAll(nameColumn, sizeColumn, priceColumn, categoryColumn, statusColumn, actionsColumn);
 
         itemTV.setItems(items);
+
+
     }
 
     @Override
@@ -93,11 +97,14 @@ public class RequestPage extends Page {
         setTop(NavigationBar.getNavigationBar());
         container.getChildren().addAll(pageLbl, itemTV);
         container.setSpacing(14);
-        container.setMaxWidth(AppConfig.SCREEN_WIDTH * 0.8);
+
+        double tableWidth = AppConfig.SCREEN_WIDTH * 0.8;
+
+        container.setMaxWidth(tableWidth);
         container.setPadding(new Insets(20, 0, 0, 0));
         setCenter(container);
         itemTV.getColumns().forEach(col -> {
-            ((TableColumn<?, ?>) col).setMinWidth(AppConfig.SCREEN_WIDTH * 0.8 / itemTV.getColumns().size());
+            ((TableColumn<?, ?>) col).setMinWidth(tableWidth / itemTV.getColumns().size());
         });
     }
 
@@ -112,37 +119,45 @@ public class RequestPage extends Page {
     }
 
     private Callback<TableColumn<Item, Void>, TableCell<Item, Void>> createActionCellFactory() {
-        EventHandler<ActionEvent> event = new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent e)
-            {
-
-                declineTD.showAndWait();
-
-            }
-        };
         return new Callback<>() {
             @Override
             public TableCell<Item, Void> call(final TableColumn<Item, Void> param) {
                 return new TableCell<>() {
-                    private final Button acceptButton = new Button("Approve");
-                    private final Button declineButton = new Button("Decline");
+                    private final Button approveBtn = new Button("Approve");
+                    private final Button declineBtn = new Button("Decline");
 
                     {
-                        acceptButton.setOnAction(event -> {
+                        approveBtn.setOnAction(event -> {
                             Item item = getTableView().getItems().get(getIndex());
                             Response<Item> response = itemController.approveItem(item.getItemId());
 
                             if (!response.isSuccess()) {
-                                AlertHelper.showError("Accept Item", response.getMessage());
+                                AlertHelper.showError("Operation Failed", response.getMessage());
                                 return;
                             }
 
-                            AlertHelper.showInfo("Accept Item", response.getMessage());
+                            AlertHelper.showInfo("Operation Success", response.getMessage());
                             createOrRefreshPage();
                         });
 
 
-                        declineButton.setOnAction(event);
+                        declineBtn.setOnAction(event -> {
+                            Item item = getTableView().getItems().get(getIndex());
+
+                            Optional<String> result = declineTD.showAndWait();
+
+                            result.ifPresent(reason -> {
+                                Response<Item> response = itemController.declineItem(item.getItemId(), reason);
+
+                                if (!response.isSuccess()) {
+                                    AlertHelper.showError("Operation Failed", response.getMessage());
+                                    return;
+                                }
+
+                                AlertHelper.showInfo("Operation Success", response.getMessage());
+                                createOrRefreshPage();
+                            });
+                        });
                     }
 
                     @Override
@@ -151,7 +166,7 @@ public class RequestPage extends Page {
                         if (empty) {
                             setGraphic(null);
                         } else {
-                            HBox actionButtons = new HBox(acceptButton, declineButton);
+                            HBox actionButtons = new HBox(approveBtn, declineBtn);
                             actionButtons.setSpacing(10);
                             setGraphic(actionButtons);
                         }
@@ -162,45 +177,6 @@ public class RequestPage extends Page {
     }
 
     private static RequestPage instance;
-
-    @Override
-    public void setLayout() {
-        setTop(NavigationBar.getNavigationBar());
-        container.getChildren().addAll(pageLbl, itemTV);
-        container.setSpacing(10);
-
-        container.setAlignment(Pos.CENTER);
-        double tableWidth = AppConfig.SCREEN_WIDTH * 0.8;
-        container.setMaxWidth(tableWidth);
-
-        setCenter(container);
-
-        pageLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 32px; -fx-font-weight: bolder;");
-
-        itemTV.getColumns().forEach(col -> {
-            ((TableColumn)col).setMinWidth(tableWidth / itemTV.getColumns().size());
-        });
-    }
-
-
-
-    @Override
-    public void createOrRefreshPage() {
-        Response<List<Item>> response = itemController.viewRequestedItem();
-
-        if (response.isSuccess()) {
-            items = FXCollections.observableArrayList(response.getData());
-        }
-        else {
-            items = FXCollections.emptyObservableList();
-        }
-
-        super.createOrRefreshPage();
-    }
-
-    @Override
-    public void setStyle() {
-
 
     public static RequestPage getInstance() {
         return instance = (instance == null) ? new RequestPage() : instance;

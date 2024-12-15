@@ -2,12 +2,15 @@ package view.component.card;
 
 import config.AppConfig;
 import controller.ItemController;
+import controller.OfferController;
 import controller.TransactionController;
 import enums.UserRole;
 import interfaces.IComponent;
 import javafx.geometry.Insets;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -15,15 +18,19 @@ import lib.manager.PageManager;
 import lib.manager.SessionManager;
 import lib.response.Response;
 import model.Item;
+import model.Offer;
 import model.Transaction;
 import utils.AlertHelper;
 import view.HomePage;
 import view.seller.EditItemPage;
 
+import java.util.Optional;
+
 public final class ItemCard extends BorderPane implements IComponent {
 
     private final ItemController itemController;
     private final TransactionController transactionController;
+    private final OfferController offerController;
 
     private final Item item;
     private final boolean isOwner;
@@ -39,6 +46,9 @@ public final class ItemCard extends BorderPane implements IComponent {
     private Button editBtn;
     private Button deleteBtn;
     private Button buyBtn;
+    private Button offerBtn;
+
+    private TextInputDialog offerTD;
 
     private HBox bottomContainer;
 
@@ -56,6 +66,11 @@ public final class ItemCard extends BorderPane implements IComponent {
             deleteBtn = new Button("Delete");
         } else if (SessionManager.getCurrentUser().getRole() != UserRole.ADMIN) {
             buyBtn = new Button("Buy");
+            offerBtn = new Button("Make offer");
+            offerTD = new TextInputDialog();
+
+            offerTD.setHeaderText("");
+            offerTD.setTitle("Make offer");
         }
 
         container = new VBox();
@@ -71,7 +86,7 @@ public final class ItemCard extends BorderPane implements IComponent {
         if (isOwner) {
             btnContainer.getChildren().addAll(editBtn, deleteBtn);
         } else if (SessionManager.getCurrentUser().getRole() != UserRole.ADMIN) {
-            btnContainer.getChildren().add(buyBtn);
+            btnContainer.getChildren().addAll(buyBtn, offerBtn);
         }
     }
 
@@ -123,6 +138,10 @@ public final class ItemCard extends BorderPane implements IComponent {
             buyBtn.setOnMouseClicked(e -> {
                 buy();
             });
+
+            offerBtn.setOnMouseClicked(evt -> {
+                makeOffer();
+            });
         }
     }
 
@@ -136,6 +155,45 @@ public final class ItemCard extends BorderPane implements IComponent {
         }
         AlertHelper.showInfo("Item Deletion", response.getMessage());
         HomePage.getInstance().createOrRefreshPage();
+    }
+
+    private void makeOffer() {
+        Response<Offer> highestOfferResponse = offerController.getItemHighestOffer(item.getItemId());
+
+        if (!highestOfferResponse.isSuccess()) {
+            AlertHelper.showError("Operation failed", "Cannot get highest offer, please try again later.");
+            return;
+        }
+
+        Offer highestOffer = highestOfferResponse.getData();
+
+        offerTD.setContentText(String.format("Input your offer (Highest offer: %d): ", highestOffer == null ? 0 : highestOffer.getOfferPrice()));
+
+        Optional<String> result = offerTD.showAndWait();
+
+        result.ifPresent(input -> {
+            System.out.println(input);
+            if (input.isBlank()) {
+                AlertHelper.showError("Invalid Input", "Input cannot be empty");
+                return;
+            }
+
+            try {
+                int offerPrice = Integer.parseInt(input);
+                Response<Offer> response =  offerController.createOffer(item.getItemId(), SessionManager.getCurrentUser().getUserId(), offerPrice);
+
+                if (!response.isSuccess()) {
+                    AlertHelper.showError("Operation Failed", response.getMessage());
+                    return;
+                }
+
+                AlertHelper.showInfo("Operation Success", response.getMessage());
+
+            } catch (NumberFormatException e) {
+                AlertHelper.showError("Invalid Input", "Input must be a number");
+            }
+        });
+
     }
 
     private void buy() {
@@ -154,6 +212,7 @@ public final class ItemCard extends BorderPane implements IComponent {
         this.isOwner = isOwned;
         this.itemController = ItemController.getInstance();
         this.transactionController = TransactionController.getInstance();
+        this.offerController = OfferController.getInstance();
         init();
         setLayout();
         setStyle();

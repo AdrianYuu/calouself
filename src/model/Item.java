@@ -15,6 +15,7 @@ public final class Item {
     private Integer itemPrice;
     private String itemCategory;
     private ItemStatus itemStatus;
+    private String declineReason;
     private String sellerId;
 
     public Item(String itemId, String itemName, String itemSize, Integer itemPrice, String itemCategory, ItemStatus itemStatus, String sellerId) {
@@ -25,6 +26,17 @@ public final class Item {
         this.itemCategory = itemCategory;
         this.itemStatus = itemStatus;
         this.sellerId = sellerId;
+    }
+
+    public Item(String itemId, String itemName, String itemSize, Integer itemPrice, String itemCategory, ItemStatus itemStatus, String declineReason, String sellerId) {
+        this.itemId = itemId;
+        this.itemName = itemName;
+        this.itemSize = itemSize;
+        this.itemPrice = itemPrice;
+        this.itemCategory = itemCategory;
+        this.itemStatus = itemStatus;
+        this.sellerId = sellerId;
+        this.declineReason = declineReason;
     }
 
     public static boolean create(String itemName, String itemSize, Integer itemPrice, String itemCategory, ItemStatus itemStatus, String sellerId) {
@@ -48,6 +60,7 @@ public final class Item {
                                 rs.getInt("item_price"),
                                 rs.getString("item_category"),
                                 ItemStatus.valueOf(rs.getString("item_status")),
+                                rs.getString("decline_reason"),
                                 rs.getString("seller_id")
                         )
                 );
@@ -73,6 +86,7 @@ public final class Item {
                         rs.getInt("item_price"),
                         rs.getString("item_category"),
                         ItemStatus.valueOf(rs.getString("item_status")),
+                        rs.getString("decline_reason"),
                         rs.getString("seller_id")
                 );
             }
@@ -83,16 +97,17 @@ public final class Item {
         return null;
     }
 
-    public static boolean update(String itemId, String itemName, String itemSize, Integer itemPrice, String itemCategory, ItemStatus itemStatus, String sellerId) {
+    public static boolean update(String itemId, String itemName, String itemSize, Integer itemPrice, String itemCategory, ItemStatus itemStatus, String declineReason, String sellerId) {
         String query = "UPDATE items " +
                 "SET item_name = ?, " +
                 "item_size = ?, " +
                 "item_price = ?, " +
                 "item_category = ?, " +
                 "item_status = ?, " +
+                "decline_reason = ?, " +
                 "seller_id = ? " +
                 "WHERE item_id = ?";
-        return Connect.getConnection().executePreparedUpdate(query, itemName, itemSize, itemPrice, itemCategory, itemStatus.name(), sellerId, itemId);
+        return Connect.getConnection().executePreparedUpdate(query, itemName, itemSize, itemPrice, itemCategory, itemStatus.name(), declineReason, sellerId, itemId);
     }
 
     public static boolean delete(String itemId) {

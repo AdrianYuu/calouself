@@ -126,11 +126,11 @@ public final class RegisterPage extends Page {
 
     @Override
     public void setEvent() {
-        submitBtn.setOnMouseClicked(e -> {
+        submitBtn.setOnAction(e -> {
             register();
         });
 
-        loginHl.setOnMouseClicked(e -> {
+        loginHl.setOnAction(e -> {
             navigateToLogin();
         });
     }

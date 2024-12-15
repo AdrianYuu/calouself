@@ -45,6 +45,7 @@ public final class Migration {
                 "item_price VARCHAR(100)," +
                 "item_category VARCHAR(100)," +
                 "item_status VARCHAR(100)," +
+                "decline_reason VARCHAR(100)," +
                 "seller_id INT," +
                 "FOREIGN KEY (seller_id) REFERENCES users(user_id)" +
                 ")";
@@ -52,6 +53,18 @@ public final class Migration {
     }
 
     private static void createOffersTable() {
+        String query = "CREATE TABLE offers (" +
+                "offer_id INT PRIMARY KEY AUTO_INCREMENT," +
+                "item_id INT," +
+                "buyer_id INT," +
+                "offer_price INT," +
+                "offer_status VARCHAR(100)," +
+                "decline_reason VARCHAR(100)," +
+                "FOREIGN KEY (item_id) REFERENCES items(item_id)," +
+                "FOREIGN KEY (buyer_id) REFERENCES users(user_id)" +
+                ")";
+        Connect.getConnection().executeUpdate(query);
+
     }
 
     private static void createTransactionsTable() {

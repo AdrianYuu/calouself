@@ -4,17 +4,13 @@ import enums.ItemStatus;
 import lib.manager.SessionManager;
 import lib.response.Response;
 import model.Item;
+import utils.AlertHelper;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public final class ItemController {
 
-    private static ItemController instance;
-
-    public static ItemController getInstance() {
-        return instance = (instance == null) ? new ItemController() : instance;
-    }
 
     private ItemController() {
     }
@@ -32,7 +28,7 @@ public final class ItemController {
             return Response.Failed("Failed to upload item.");
         }
 
-        return Response.Success("Successfully uploaded item.", null);
+        return Response.Success("Item uploaded successfully.", null);
     }
 
     public Response<List<Item>> viewItems() {
@@ -45,6 +41,16 @@ public final class ItemController {
         return Response.Success("Successfully get accepted items.", items);
     }
 
+    public Response<Item> getById(String itemId) {
+        Item item = Item.getById(itemId);
+
+        if (item == null) {
+            return Response.Failed("Item not found.");
+        }
+
+        return Response.Success("Successfully get item.", item);
+    }
+
     public Response<List<Item>> viewRequestedItems() {
         List<Item> items = Item.getAll().stream().filter(item -> item.getItemStatus() == ItemStatus.PENDING).collect(Collectors.toList());
 
@@ -55,15 +61,6 @@ public final class ItemController {
         return Response.Success("Successfully get requested items.", items);
     }
 
-    public Response<List<Item>> viewRequestedItem() {
-        List<Item> items = Item.getAll();
-
-        if (items == null) {
-            return Response.Failed("There is no items.");
-        }
-
-        return Response.Success(items.stream().filter(item -> item.getItemStatus() == ItemStatus.PENDING ).collect(Collectors.toList()));
-    }
     public Response<Item> approveItem(String itemId) {
         Item item = Item.getById(itemId);
 
@@ -81,6 +78,7 @@ public final class ItemController {
                 item.getItemPrice(),
                 item.getItemCategory(),
                 ItemStatus.APPROVED,
+                null,
                 item.getSellerId()
         );
 
@@ -88,10 +86,14 @@ public final class ItemController {
             return Response.Failed("Failed to delete item.");
         }
 
-        return Response.Success("Successfully approve item.", null);
+        return Response.Success("Item approved successfully.", null);
     }
 
-    public Response<Item> declineItem(String itemId) {
+    public Response<Item> declineItem(String itemId, String reason) {
+        if (reason.isBlank()) {
+            return Response.Failed("Reason cannot be empty.");
+        }
+
         Item item = Item.getById(itemId);
 
         if (item == null) {
@@ -108,6 +110,7 @@ public final class ItemController {
                 item.getItemPrice(),
                 item.getItemCategory(),
                 ItemStatus.DECLINED,
+                reason,
                 item.getSellerId()
         );
 
@@ -115,7 +118,7 @@ public final class ItemController {
             return Response.Failed("Failed to delete item.");
         }
 
-        return Response.Success("Successfully decline item.", null);
+        return Response.Success("Item declined successfully.", null);
     }
 
     public Response<Item> deleteItem(String itemId) {
@@ -125,7 +128,7 @@ public final class ItemController {
             return Response.Failed("Failed to delete item.");
         }
 
-        return Response.Success("Successfully delete item.", null);
+        return Response.Success("Item deleted successfully.", null);
     }
 
     public Response<Item> editItem(String itemId, String itemName, String itemSize, String itemPrice, String itemCategory) {
@@ -135,13 +138,13 @@ public final class ItemController {
             return Response.Failed("Item does not exists.");
         }
 
-        boolean isSuccess = Item.update(itemId, itemName, itemSize, Integer.parseInt(itemPrice), itemCategory, item.getItemStatus(), item.getSellerId());
+        boolean isSuccess = Item.update(itemId, itemName, itemSize, Integer.parseInt(itemPrice), itemCategory, item.getItemStatus(), null, item.getSellerId());
 
         if (!isSuccess) {
             return Response.Failed("Failed to update item.");
         }
 
-        return Response.Success("Successfully update item.", null);
+        return Response.Success("Item updated successfully.", null);
     }
 
     private String checkItemValidation(String itemName, String itemSize, String itemPrice, String itemCategory) {
@@ -179,4 +182,9 @@ public final class ItemController {
         return "";
     }
 
+    private static ItemController instance;
+
+    public static ItemController getInstance() {
+        return instance = (instance == null) ? new ItemController() : instance;
+    }
 }
