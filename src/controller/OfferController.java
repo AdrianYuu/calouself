@@ -2,21 +2,43 @@ package controller;
 
 import enums.OfferStatus;
 import lib.response.Response;
+import model.Item;
 import model.Offer;
 import model.Transaction;
+import viewmodel.OfferViewModel;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class OfferController {
-    public Response<List<Offer>> getPendingOffers(String sellerId) {
-        List<Offer> offers = Offer.getBySellerId(sellerId);
+    public Response<List<OfferViewModel>> viewPendingOffers(String sellerId) {
+        ItemController itemController = ItemController.getInstance();
+        List<OfferViewModel> offerVMList = new ArrayList<>();
 
-        if (offers.isEmpty()) {
-            return Response.Failed("There is no offer.");
+        List<Offer> offers = Offer.getAll();
+
+        for (Offer offer : offers) {
+            if (offer.getOfferStatus() != OfferStatus.PENDING) {
+                continue;
+            }
+
+            Response<Item> itemResponse = itemController.getById(offer.getItemId());
+
+            if (!itemResponse.isSuccess()) {
+                continue;
+            }
+
+            Item item = itemResponse.getData();
+
+            if (!item.getSellerId().equals(sellerId)) {
+                continue;
+            }
+
+            offerVMList.add(new OfferViewModel(offer, item));
         }
 
-        return Response.Success("Successfully get offered items", offers.stream().filter(offer -> offer.getOfferStatus() == OfferStatus.PENDING).collect(Collectors.toList()));
+        return Response.Success("Successfully get offers.", offerVMList);
     }
 
     public Response<Offer> getItemHighestOffer(String itemId) {
@@ -96,7 +118,10 @@ public class OfferController {
         return Response.Success("Offer created successfully", null);
     }
 
-    public Response<Offer> declineOffer(String offerId, String declineReason) {
+    public Response<Offer> declineOffer(String offerId, String reason) {
+        if (reason.isBlank()) {
+            return Response.Failed("Reason cannot be empty.");
+        }
         Offer offer = Offer.getById(offerId);
 
         if (offer == null) {
@@ -109,7 +134,7 @@ public class OfferController {
                 offer.getBuyerId(),
                 offer.getOfferPrice(),
                 OfferStatus.DECLINED,
-                declineReason
+                reason
         );
 
         if (!isSuccess) {

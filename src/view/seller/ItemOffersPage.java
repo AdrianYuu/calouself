@@ -3,6 +3,7 @@ package view.seller;
 import config.AppConfig;
 import controller.ItemController;
 import controller.OfferController;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -18,6 +19,7 @@ import model.Offer;
 import utils.AlertHelper;
 import view.base.Page;
 import view.component.navbar.NavigationBar;
+import viewmodel.OfferViewModel;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,26 +28,26 @@ public class ItemOffersPage extends Page {
     private final ItemController itemController;
     private final OfferController offerController;
 
-    private ObservableList<Offer> offers;
+    private ObservableList<OfferViewModel> offers;
 
     private VBox container;
 
     private Label pageLbl;
 
     private TableView offerTV;
-    private TableColumn<Offer, String> nameColumn;
-    private TableColumn<Offer, String> categoryColumn;
-    private TableColumn<Offer, String> sizeColumn;
-    private TableColumn<Offer, Integer> initialPriceColumn;
-    private TableColumn<Offer, String> offeredPriceColumn;
-    private TableColumn<Offer, Void> actionsColumn;
+    private TableColumn<OfferViewModel, String> nameColumn;
+    private TableColumn<OfferViewModel, String> categoryColumn;
+    private TableColumn<OfferViewModel, String> sizeColumn;
+    private TableColumn<OfferViewModel, String> initialPriceColumn;
+    private TableColumn<OfferViewModel, String> offeredPriceColumn;
+    private TableColumn<OfferViewModel, Void> actionsColumn;
 
 
     private TextInputDialog declineTD;
 
     @Override
     public void init() {
-        Response<List<Offer>> response = offerController.getPendingOffers(SessionManager.getCurrentUser().getUserId());
+        Response<List<OfferViewModel>> response = offerController.viewPendingOffers(SessionManager.getCurrentUser().getUserId());
 
         if (response.isSuccess()) {
             offers = FXCollections.observableArrayList(response.getData());
@@ -67,22 +69,20 @@ public class ItemOffersPage extends Page {
         declineTD.setHeaderText("");
         declineTD.setGraphic(null);
 
-        TableColumn<Item, String> nameColumn = new TableColumn<>("Name");
-
         nameColumn = new TableColumn<>("Name");
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("itemName"));
+        nameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getItem().getItemName()));
 
         sizeColumn = new TableColumn<>("Size");
-        sizeColumn.setCellValueFactory(new PropertyValueFactory<>("itemSize"));
+        sizeColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getItem().getItemSize()));
 
         categoryColumn = new TableColumn<>("Category");
-        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("itemCategory"));
+        categoryColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getItem().getItemCategory()));
 
         initialPriceColumn = new TableColumn<>("Initial Price");
-        initialPriceColumn.setCellValueFactory(new PropertyValueFactory<>("itemPrice"));
+        initialPriceColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getItem().getItemPrice().toString()));
 
         offeredPriceColumn = new TableColumn<>("Offered Price");
-        offeredPriceColumn.setCellValueFactory(new PropertyValueFactory<>("offerPrice"));
+        offeredPriceColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getOffer().getOfferPrice().toString()));
 
         actionsColumn = new TableColumn<>("Actions");
         actionsColumn.setCellFactory(createActionCellFactory());
@@ -92,18 +92,18 @@ public class ItemOffersPage extends Page {
         offerTV.setItems(offers);
     }
 
-    private Callback<TableColumn<Offer, Void>, TableCell<Offer, Void>> createActionCellFactory() {
+    private Callback<TableColumn<OfferViewModel, Void>, TableCell<OfferViewModel, Void>> createActionCellFactory() {
         return new Callback<>() {
             @Override
-            public TableCell<Offer, Void> call(final TableColumn<Offer, Void> param) {
+            public TableCell<OfferViewModel, Void> call(final TableColumn<OfferViewModel, Void> param) {
                 return new TableCell<>() {
                     private final Button acceptBtn = new Button("Accept");
                     private final Button declineBtn = new Button("Decline");
 
                     {
                         acceptBtn.setOnAction(event -> {
-                            Offer offer = getTableView().getItems().get(getIndex());
-                            Response<Offer> response = offerController.acceptOffer(offer.getOfferId());
+                            OfferViewModel offerVM = getTableView().getItems().get(getIndex());
+                            Response<Offer> response = offerController.acceptOffer(offerVM.getOffer().getOfferId());
 
                             if (!response.isSuccess()) {
                                 AlertHelper.showError("Operation Failed", response.getMessage());
@@ -116,12 +116,12 @@ public class ItemOffersPage extends Page {
 
 
                         declineBtn.setOnAction(event -> {
-                            Offer offer = getTableView().getItems().get(getIndex());
+                            OfferViewModel offerVM = getTableView().getItems().get(getIndex());
 
                             Optional<String> result = declineTD.showAndWait();
 
                             result.ifPresent(reason -> {
-                                Response<Offer> response = offerController.declineOffer(offer.getOfferId(), reason);
+                                Response<Offer> response = offerController.declineOffer(offerVM.getOffer().getOfferId(), reason);
 
                                 if (!response.isSuccess()) {
                                     AlertHelper.showError("Operation Failed", response.getMessage());

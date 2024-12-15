@@ -32,13 +32,12 @@ public final class Offer {
         return Connect.getConnection().executePreparedUpdate(query, itemId, buyerId, offerPrice, offerStatus.name());
     }
 
-    public static List<Offer> getBySellerId(String sellerId) {
-        String query = "SELECT * FROM offers WHERE seller_id = ?";
+    public static List<Offer> getAll() {
+        String query = "SELECT * FROM offers";
 
         List<Offer> offers = new ArrayList<>();
 
-
-        ResultSet rs = Connect.getConnection().executePreparedQuery(query, sellerId);
+        ResultSet rs = Connect.getConnection().executePreparedQuery(query);
 
         try {
             while (rs.next()) {
@@ -94,7 +93,7 @@ public final class Offer {
             ResultSet rs = Connect.getConnection().executePreparedQuery(query, offerId);
 
             if (rs.next()) {
-                new Offer(
+                return new Offer(
                         rs.getString("offer_id"),
                         rs.getString("item_id"),
                         rs.getString("buyer_id"),
@@ -111,15 +110,15 @@ public final class Offer {
     }
 
     public static boolean update(String offerId, String itemId, String buyerId, Integer offerPrice, OfferStatus offerStatus, String declineReason) {
-        String query = "UPDATE offers" +
-                "SET item_id = ?," +
-                "buyer_id = ?," +
-                "offer_price = ?," +
-                "offer_status = ?" +
-                "decline_reason = ?" +
+        String query = "UPDATE offers " +
+                "SET item_id = ?, " +
+                "buyer_id = ?, " +
+                "offer_price = ?, " +
+                "offer_status = ?, " +
+                "decline_reason = ? " +
                 "WHERE offer_id = ?";
 
-        return Connect.getConnection().executePreparedUpdate(query, itemId, buyerId, offerPrice, offerStatus.name(), offerId);
+        return Connect.getConnection().executePreparedUpdate(query, itemId, buyerId, offerPrice, offerStatus.name(), declineReason, offerId);
     }
 
     public String getOfferId() {
