@@ -1,19 +1,20 @@
-package view.admin;
+package view.seller;
 
 import config.AppConfig;
 import controller.ItemController;
+import controller.OfferController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import javafx.geometry.Insets;
-
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
+import lib.manager.SessionManager;
 import lib.response.Response;
 import model.Item;
+import model.Offer;
 import utils.AlertHelper;
 import view.base.Page;
 import view.component.navbar.NavigationBar;
@@ -21,42 +22,43 @@ import view.component.navbar.NavigationBar;
 import java.util.List;
 import java.util.Optional;
 
-public class RequestPage extends Page {
-
+public class ItemOffersPage extends Page {
     private final ItemController itemController;
-    private ObservableList<Item> items;
+    private final OfferController offerController;
+
+    private ObservableList<Offer> offers;
 
     private VBox container;
 
     private Label pageLbl;
 
-    private TableView itemTV;
-    private TableColumn<Item, String> nameColumn;
-    private TableColumn<Item, String> sizeColumn;
-    private TableColumn<Item, Integer> priceColumn;
-    private TableColumn<Item, String> categoryColumn;
-    private TableColumn<Item, String> statusColumn;
-    private TableColumn<Item, Void> actionsColumn;
+    private TableView offerTV;
+    private TableColumn<Offer, String> nameColumn;
+    private TableColumn<Offer, String> categoryColumn;
+    private TableColumn<Offer, String> sizeColumn;
+    private TableColumn<Offer, Integer> initialPriceColumn;
+    private TableColumn<Offer, String> offeredPriceColumn;
+    private TableColumn<Offer, Void> actionsColumn;
 
 
     private TextInputDialog declineTD;
 
     @Override
     public void init() {
-        Response<List<Item>> response = itemController.viewRequestedItems();
+        Response<List<Offer>> response = offerController.getPendingOffers(SessionManager.getCurrentUser().getUserId());
 
         if (response.isSuccess()) {
-            items = FXCollections.observableArrayList(response.getData());
+            offers = FXCollections.observableArrayList(response.getData());
         }
         else {
-            items = FXCollections.emptyObservableList();
+            offers = FXCollections.emptyObservableList();
         }
 
         container = new VBox();
 
-        pageLbl = new Label("Item Requests");
+        pageLbl = new Label("Item Offers");
 
-        itemTV = new TableView<>();
+        offerTV = new TableView<>();
 
         declineTD = new TextInputDialog();
 
@@ -73,63 +75,35 @@ public class RequestPage extends Page {
         sizeColumn = new TableColumn<>("Size");
         sizeColumn.setCellValueFactory(new PropertyValueFactory<>("itemSize"));
 
-        priceColumn = new TableColumn<>("Price");
-        priceColumn.setCellValueFactory(new PropertyValueFactory<>("itemPrice"));
-
         categoryColumn = new TableColumn<>("Category");
         categoryColumn.setCellValueFactory(new PropertyValueFactory<>("itemCategory"));
 
-        statusColumn = new TableColumn<>("Status");
-        statusColumn.setCellValueFactory(new PropertyValueFactory<>("itemStatus"));
+        initialPriceColumn = new TableColumn<>("Initial Price");
+        initialPriceColumn.setCellValueFactory(new PropertyValueFactory<>("itemPrice"));
+
+        offeredPriceColumn = new TableColumn<>("Offered Price");
+        offeredPriceColumn.setCellValueFactory(new PropertyValueFactory<>("offerPrice"));
 
         actionsColumn = new TableColumn<>("Actions");
         actionsColumn.setCellFactory(createActionCellFactory());
 
-        itemTV.getColumns().addAll(nameColumn, sizeColumn, priceColumn, categoryColumn, statusColumn, actionsColumn);
+        offerTV.getColumns().addAll(nameColumn, sizeColumn, categoryColumn, initialPriceColumn, offeredPriceColumn, actionsColumn);
 
-        itemTV.setItems(items);
-
-
+        offerTV.setItems(offers);
     }
 
-    @Override
-    public void setLayout() {
-        setTop(NavigationBar.getNavigationBar());
-        container.getChildren().addAll(pageLbl, itemTV);
-        container.setSpacing(14);
-
-        double tableWidth = AppConfig.SCREEN_WIDTH * 0.8;
-
-        container.setMaxWidth(tableWidth);
-        container.setPadding(new Insets(20, 0, 0, 0));
-        setCenter(container);
-        itemTV.getColumns().forEach(col -> {
-            ((TableColumn<?, ?>) col).setMinWidth(tableWidth / itemTV.getColumns().size());
-        });
-    }
-
-    @Override
-    public void setStyle() {
-        pageLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 32px; -fx-font-weight: bolder;");
-    }
-
-    @Override
-    public void setEvent() {
-
-    }
-
-    private Callback<TableColumn<Item, Void>, TableCell<Item, Void>> createActionCellFactory() {
+    private Callback<TableColumn<Offer, Void>, TableCell<Offer, Void>> createActionCellFactory() {
         return new Callback<>() {
             @Override
-            public TableCell<Item, Void> call(final TableColumn<Item, Void> param) {
+            public TableCell<Offer, Void> call(final TableColumn<Offer, Void> param) {
                 return new TableCell<>() {
-                    private final Button approveBtn = new Button("Approve");
+                    private final Button acceptBtn = new Button("Accept");
                     private final Button declineBtn = new Button("Decline");
 
                     {
-                        approveBtn.setOnAction(event -> {
-                            Item item = getTableView().getItems().get(getIndex());
-                            Response<Item> response = itemController.approveItem(item.getItemId());
+                        acceptBtn.setOnAction(event -> {
+                            Offer offer = getTableView().getItems().get(getIndex());
+                            Response<Offer> response = offerController.acceptOffer(offer.getOfferId());
 
                             if (!response.isSuccess()) {
                                 AlertHelper.showError("Operation Failed", response.getMessage());
@@ -142,12 +116,12 @@ public class RequestPage extends Page {
 
 
                         declineBtn.setOnAction(event -> {
-                            Item item = getTableView().getItems().get(getIndex());
+                            Offer offer = getTableView().getItems().get(getIndex());
 
                             Optional<String> result = declineTD.showAndWait();
 
                             result.ifPresent(reason -> {
-                                Response<Item> response = itemController.declineItem(item.getItemId(), reason);
+                                Response<Offer> response = offerController.declineOffer(offer.getOfferId(), reason);
 
                                 if (!response.isSuccess()) {
                                     AlertHelper.showError("Operation Failed", response.getMessage());
@@ -166,7 +140,7 @@ public class RequestPage extends Page {
                         if (empty) {
                             setGraphic(null);
                         } else {
-                            HBox actionButtons = new HBox(approveBtn, declineBtn);
+                            HBox actionButtons = new HBox(acceptBtn, declineBtn);
                             actionButtons.setSpacing(10);
                             setGraphic(actionButtons);
                         }
@@ -176,15 +150,43 @@ public class RequestPage extends Page {
         };
     }
 
-    private static RequestPage instance;
+    @Override
+    public void setLayout() {
+        setTop(NavigationBar.getNavigationBar());
+        container.getChildren().addAll(pageLbl, offerTV);
+        container.setSpacing(14);
 
-    public static RequestPage getInstance() {
-        return instance = (instance == null) ? new RequestPage() : instance;
+        double tableWidth = AppConfig.SCREEN_WIDTH * 0.8;
+
+        container.setMaxWidth(tableWidth);
+        container.setPadding(new Insets(20, 0, 0, 0));
+        setCenter(container);
+
+        offerTV.getColumns().forEach(col -> {
+            ((TableColumn<?, ?>) col).setMinWidth(tableWidth / offerTV.getColumns().size());
+        });
     }
 
-    private RequestPage() {
+    @Override
+    public void setStyle() {
+        pageLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 32px; -fx-font-weight: bolder;");
+    }
+
+    @Override
+    public void setEvent() {
+
+    }
+
+    private static ItemOffersPage instance;
+
+    public static ItemOffersPage getInstance() {
+        return instance = (instance == null) ? new ItemOffersPage() : instance;
+    }
+
+    private ItemOffersPage() {
         itemController = ItemController.getInstance();
+        offerController = OfferController.getInstance();
+
         createOrRefreshPage();
     }
-
 }

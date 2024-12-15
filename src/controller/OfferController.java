@@ -2,36 +2,21 @@ package controller;
 
 import enums.OfferStatus;
 import lib.response.Response;
-import model.Item;
 import model.Offer;
 import model.Transaction;
-import utils.AlertHelper;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class OfferController {
-    public Response<List<Item>> getOfferedItems(String sellerId) {
+    public Response<List<Offer>> getPendingOffers(String sellerId) {
         List<Offer> offers = Offer.getBySellerId(sellerId);
 
         if (offers.isEmpty()) {
             return Response.Failed("There is no offer.");
         }
 
-        List<Item> items = new ArrayList<>();
-
-        for (Offer offer : offers) {
-            if (offer.getOfferStatus() != OfferStatus.PENDING) {
-                continue;
-            }
-
-            Item item = Item.getById(offer.getItemId());
-            if (item != null) {
-                items.add(item);
-            }
-        }
-
-        return Response.Success("Successfully get offered items", items);
+        return Response.Success("Successfully get offered items", offers.stream().filter(offer -> offer.getOfferStatus() == OfferStatus.PENDING).collect(Collectors.toList()));
     }
 
     public Response<Offer> getItemHighestOffer(String itemId) {
