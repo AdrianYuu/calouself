@@ -1,8 +1,12 @@
 package controller;
 
 import lib.response.Response;
+import model.Item;
 import model.Transaction;
+import viewmodel.PurchaseHistoryViewModel;
 
+import java.sql.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class TransactionController {
@@ -26,14 +30,23 @@ public final class TransactionController {
         return Response.Success("Successfully purchase item.", null);
     }
 
-    public Response<List<Transaction>> viewHistory(String userId) {
+    public Response<List<PurchaseHistoryViewModel>> viewHistory(String userId) {
         List<Transaction> transactions = Transaction.getByUserId(userId);
+        ItemController itemController = ItemController.getInstance();
+        List<PurchaseHistoryViewModel> purchaseHistoriesVM = new ArrayList<>();
 
         if(transactions.isEmpty()){
             return Response.Failed("There is no history.");
         }
 
-        return Response.Success("Successfully get histories.", transactions);
+        for(Transaction transaction : transactions){
+            Response<Item> response = itemController.getById(transaction.getItemId());
+            if(!response.isSuccess()) continue;
+            Item item = response.getData();
+            purchaseHistoriesVM.add(new PurchaseHistoryViewModel(transaction, item));
+        }
+
+        return Response.Success("Successfully get histories.", purchaseHistoriesVM);
     }
 
 }

@@ -13,6 +13,8 @@ public final class Migration {
     }
 
     private static void dropOffersTable() {
+        String query = "DROP TABLE IF EXISTS offers";
+        Connect.getConnection().executeUpdate(query);
     }
 
     private static void dropTransactionsTable() {
@@ -64,7 +66,6 @@ public final class Migration {
                 "FOREIGN KEY (buyer_id) REFERENCES users(user_id)" +
                 ")";
         Connect.getConnection().executeUpdate(query);
-
     }
 
     private static void createTransactionsTable() {
@@ -80,12 +81,12 @@ public final class Migration {
 
     private static void createWishlistsTable() {
         String query = "CREATE TABLE wishlists (" +
-                    "wishlist_id INT PRIMARY KEY AUTO_INCREMENT," +
-                    "user_id INT," +
-                    "item_id INT," +
-                    "FOREIGN KEY (user_id) REFERENCES users(user_id)," +
-                    "FOREIGN KEY (item_id) REFERENCES items(item_id)" +
-                    ")";
+                            "wishlist_id INT PRIMARY KEY AUTO_INCREMENT," +
+                            "user_id INT," +
+                            "item_id INT," +
+                            "FOREIGN KEY (user_id) REFERENCES users(user_id)," +
+                            "FOREIGN KEY (item_id) REFERENCES items(item_id)" +
+                        ")";
         Connect.getConnection().executeUpdate(query);
     }
 

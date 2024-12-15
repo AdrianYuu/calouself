@@ -3,7 +3,9 @@ package view.component.navbar;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import lib.manager.PageManager;
+import lib.manager.SessionManager;
 import view.HomePage;
+import view.auth.LoginPage;
 import view.seller.ItemOffersPage;
 import view.seller.UploadItemPage;
 
@@ -11,6 +13,7 @@ public final class SellerNavigationBar extends NavigationBar {
 
     private Menu homeMn;
     private MenuItem homeMi;
+    private MenuItem logoutMi;
 
     private Menu itemMn;
     private MenuItem uploadItemMi;
@@ -22,13 +25,14 @@ public final class SellerNavigationBar extends NavigationBar {
         itemMn = new Menu("Item");
 
         homeMi = new MenuItem("Home");
+        logoutMi = new MenuItem("Logout");
         uploadItemMi = new MenuItem("Upload Item");
         viewItemOffers = new MenuItem("View Item Offers");
     }
 
     @Override
     public void setLayout() {
-        homeMn.getItems().add(homeMi);
+        homeMn.getItems().addAll(homeMi, logoutMi);
         itemMn.getItems().addAll(uploadItemMi, viewItemOffers);
         getMenus().addAll(homeMn, itemMn);
     }
@@ -51,6 +55,11 @@ public final class SellerNavigationBar extends NavigationBar {
         viewItemOffers.setOnAction(e -> {
             PageManager.changePage(ItemOffersPage.getInstance(), "Item Offers Page");
         });
+
+        logoutMi.setOnAction(e -> {
+            SessionManager.logout();
+            PageManager.changePage(LoginPage.getInstance(), "Login Page");
+        });
     }
 
     private static NavigationBar instance;
@@ -59,6 +68,6 @@ public final class SellerNavigationBar extends NavigationBar {
         return instance = (instance == null) ? new SellerNavigationBar() : instance;
     }
 
-    private SellerNavigationBar(){
+    private SellerNavigationBar() {
     }
 }

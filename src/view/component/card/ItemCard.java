@@ -4,6 +4,7 @@ import config.AppConfig;
 import controller.ItemController;
 import controller.OfferController;
 import controller.TransactionController;
+import controller.WishlistController;
 import enums.UserRole;
 import interfaces.IComponent;
 import javafx.geometry.Insets;
@@ -20,6 +21,7 @@ import lib.response.Response;
 import model.Item;
 import model.Offer;
 import model.Transaction;
+import model.Wishlist;
 import utils.AlertHelper;
 import view.HomePage;
 import view.seller.EditItemPage;
@@ -31,6 +33,7 @@ public final class ItemCard extends BorderPane implements IComponent {
     private final ItemController itemController;
     private final TransactionController transactionController;
     private final OfferController offerController;
+    private final WishlistController wishlistController;
 
     private final Item item;
     private final boolean isOwner;
@@ -47,6 +50,7 @@ public final class ItemCard extends BorderPane implements IComponent {
     private Button deleteBtn;
     private Button buyBtn;
     private Button offerBtn;
+    private Button wishlistBtn;
 
     private TextInputDialog offerTD;
 
@@ -71,6 +75,8 @@ public final class ItemCard extends BorderPane implements IComponent {
 
             offerTD.setHeaderText("");
             offerTD.setTitle("Make offer");
+
+            wishlistBtn = new Button("Wishlist");
         }
 
         container = new VBox();
@@ -86,7 +92,7 @@ public final class ItemCard extends BorderPane implements IComponent {
         if (isOwner) {
             btnContainer.getChildren().addAll(editBtn, deleteBtn);
         } else if (SessionManager.getCurrentUser().getRole() != UserRole.ADMIN) {
-            btnContainer.getChildren().addAll(buyBtn, offerBtn);
+            btnContainer.getChildren().addAll(buyBtn, offerBtn, wishlistBtn);
         }
     }
 
@@ -139,8 +145,12 @@ public final class ItemCard extends BorderPane implements IComponent {
                 buy();
             });
 
-            offerBtn.setOnMouseClicked(evt -> {
+            offerBtn.setOnMouseClicked(e -> {
                 makeOffer();
+            });
+
+            wishlistBtn.setOnMouseClicked(e -> {
+                wishlist();
             });
         }
     }
@@ -180,7 +190,7 @@ public final class ItemCard extends BorderPane implements IComponent {
 
             try {
                 int offerPrice = Integer.parseInt(input);
-                Response<Offer> response =  offerController.createOffer(item.getItemId(), SessionManager.getCurrentUser().getUserId(), offerPrice);
+                Response<Offer> response = offerController.createOffer(item.getItemId(), SessionManager.getCurrentUser().getUserId(), offerPrice);
 
                 if (!response.isSuccess()) {
                     AlertHelper.showError("Operation Failed", response.getMessage());
@@ -207,12 +217,24 @@ public final class ItemCard extends BorderPane implements IComponent {
         AlertHelper.showInfo("Item Buy", response.getMessage());
     }
 
+    private void wishlist() {
+        boolean isConfirmed = AlertHelper.showConfirmation("Item Wishlist", "Are you sure want to wishlist this item?");
+        if (!isConfirmed) return;
+        Response<Wishlist> response = wishlistController.addWishlist(SessionManager.getCurrentUser().getUserId(), item.getItemId());
+        if (!response.isSuccess()) {
+            AlertHelper.showError("Item Wishlist", response.getMessage());
+            return;
+        }
+        AlertHelper.showInfo("Item Wishlist", response.getMessage());
+    }
+
     public ItemCard(Item item, boolean isOwned) {
         this.item = item;
         this.isOwner = isOwned;
         this.itemController = ItemController.getInstance();
         this.transactionController = TransactionController.getInstance();
         this.offerController = OfferController.getInstance();
+        this.wishlistController = WishlistController.getInstance();
         init();
         setLayout();
         setStyle();
