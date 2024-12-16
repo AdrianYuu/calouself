@@ -66,7 +66,7 @@ public final class ItemController {
     }
 
     public Response<List<Item>> browseItem(String searchQuery) {
-        List<Item> items = Item.getAll();
+        List<Item> items = Item.getAll().stream().filter(item -> item.getItemStatus() == ItemStatus.APPROVED).collect(Collectors.toList());
 
         if (items.isEmpty()) {
             return Response.Failed("There is no items.");
