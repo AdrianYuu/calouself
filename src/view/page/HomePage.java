@@ -1,4 +1,4 @@
-package view;
+package view.page;
 
 import config.AppConfig;
 import controller.ItemController;
@@ -15,8 +15,8 @@ import lib.manager.PageManager;
 import lib.manager.SessionManager;
 import lib.response.Response;
 import model.Item;
-import view.auth.LoginPage;
-import view.base.Page;
+import view.page.auth.LoginPage;
+import view.page.base.Page;
 import view.component.card.ItemCard;
 import view.component.navbar.NavigationBar;
 

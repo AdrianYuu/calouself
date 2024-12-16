@@ -22,8 +22,8 @@ import model.Offer;
 import model.Transaction;
 import model.Wishlist;
 import utils.AlertHelper;
-import view.HomePage;
-import view.seller.EditItemPage;
+import view.page.HomePage;
+import view.page.seller.EditItemPage;
 
 import java.util.Optional;
 
