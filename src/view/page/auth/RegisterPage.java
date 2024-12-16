@@ -1,4 +1,4 @@
-package view.auth;
+package view.page.auth;
 
 import controller.UserController;
 import enums.UserRole;
@@ -12,8 +12,8 @@ import lib.manager.SessionManager;
 import lib.response.Response;
 import model.User;
 import utils.AlertHelper;
-import view.HomePage;
-import view.base.Page;
+import view.page.HomePage;
+import view.page.base.Page;
 
 import java.util.ArrayList;
 

@@ -12,6 +12,12 @@ import java.util.List;
 
 public final class OfferController {
 
+    /**
+     * Retrieves all pending offers for a specific seller.
+     *
+     * @param sellerId the ID of the seller whose pending offers are to be retrieved
+     * @return a response containing a list of OfferViewModel objects or an error message if no offers are found
+     */
     public Response<List<OfferViewModel>> viewPendingOffers(String sellerId) {
         List<Offer> offers = Offer.getAll();
 
@@ -46,6 +52,12 @@ public final class OfferController {
         return Response.Success(offersVM);
     }
 
+    /**
+     * Gets the highest pending offer for a specific item.
+     *
+     * @param itemId the ID of the item for which the highest offer is to be retrieved
+     * @return a response containing the highest offer or null if no offers are found
+     */
     public Response<Offer> getItemHighestOffer(String itemId) {
         List<Offer> offers = Offer.getByItemId(itemId);
 
@@ -65,6 +77,12 @@ public final class OfferController {
         return Response.Success(highestOffer);
     }
 
+    /**
+     * Accepts an offer and creates a transaction for the item associated with the offer.
+     *
+     * @param offerId the ID of the offer to be accepted
+     * @return a response indicating whether the offer was successfully accepted or if an error occurred
+     */
     public Response<Offer> acceptOffer(String offerId) {
         Offer offer = Offer.getById(offerId);
 
@@ -94,6 +112,14 @@ public final class OfferController {
         return Response.Success("Offer accepted successfully.");
     }
 
+    /**
+     * Creates a new offer for an item by a specific buyer.
+     *
+     * @param itemId     the ID of the item for which the offer is being made
+     * @param buyerId    the ID of the buyer making the offer
+     * @param offerPrice the price offered by the buyer for the item
+     * @return a response indicating whether the offer was successfully created or if an error occurred
+     */
     public Response<Offer> createOffer(String itemId, String buyerId, String offerPrice) {
         if (offerPrice.isBlank()) {
             return Response.Failed("Offer price can't be empty.");
@@ -139,6 +165,13 @@ public final class OfferController {
         return Response.Success("Offer created successfully");
     }
 
+    /**
+     * Declines an offer with a specified reason.
+     *
+     * @param offerId the ID of the offer to be declined
+     * @param reason  the reason for declining the offer
+     * @return a response indicating whether the offer was successfully declined or if an error occurred
+     */
     public Response<Offer> declineOffer(String offerId, String reason) {
         if (reason.isBlank()) {
             return Response.Failed("Reason can't be empty.");
@@ -168,6 +201,11 @@ public final class OfferController {
 
     private static OfferController instance;
 
+    /**
+     * Singleton implementation to get an instance of OfferController.
+     *
+     * @return the single instance of OfferController
+     */
     public static OfferController getInstance() {
         return instance = (instance == null) ? new OfferController() : instance;
     }

@@ -10,6 +10,13 @@ import java.util.List;
 
 public final class WishlistController {
 
+    /**
+     * Adds an item to the user's wishlist.
+     *
+     * @param userId the ID of the user
+     * @param itemId the ID of the item to add
+     * @return a Response object indicating success or failure with a message
+     */
     public Response<Wishlist> addWishlist(String userId, String itemId) {
         List<Wishlist> wishlists = Wishlist.getByUserId(userId);
 
@@ -34,6 +41,12 @@ public final class WishlistController {
         return Response.Success("Successfully create wishlist.");
     }
 
+    /**
+     * Retrieves the user's wishlist as a list of view models.
+     *
+     * @param userId the ID of the user
+     * @return a Response object containing the list of WishlistViewModel objects or an error message
+     */
     public Response<List<WishlistViewModel>> viewWishlist(String userId) {
         List<Wishlist> wishlists = Wishlist.getByUserId(userId);
 
@@ -56,6 +69,12 @@ public final class WishlistController {
         return Response.Success(wishlistsVM);
     }
 
+    /**
+     * Removes an item from the user's wishlist.
+     *
+     * @param wishlistId the ID of the wishlist to remove
+     * @return a Response object indicating success or failure with a message
+     */
     public Response<Wishlist> removeWishlist(String wishlistId) {
         Wishlist wishlist = Wishlist.getById(wishlistId);
 
@@ -74,6 +93,11 @@ public final class WishlistController {
 
     private static WishlistController instance;
 
+    /**
+     * Retrieves the singleton instance of WishlistController.
+     *
+     * @return the instance of WishlistController
+     */
     public static WishlistController getInstance() {
         return instance = (instance == null) ? new WishlistController() : instance;
     }

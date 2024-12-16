@@ -1,4 +1,4 @@
-package view.auth;
+package view.page.auth;
 
 import controller.UserController;
 import javafx.geometry.Pos;
@@ -9,8 +9,8 @@ import lib.manager.PageManager;
 import lib.manager.SessionManager;
 import lib.response.Response;
 import model.User;
-import view.HomePage;
-import view.base.Page;
+import view.page.HomePage;
+import view.page.base.Page;
 
 public final class LoginPage extends Page {
 

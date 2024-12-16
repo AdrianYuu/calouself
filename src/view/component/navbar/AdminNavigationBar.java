@@ -5,9 +5,9 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import lib.manager.PageManager;
 import lib.manager.SessionManager;
-import view.HomePage;
-import view.admin.RequestPage;
-import view.auth.LoginPage;
+import view.page.HomePage;
+import view.page.admin.RequestPage;
+import view.page.auth.LoginPage;
 
 public final class AdminNavigationBar extends NavigationBar {
 

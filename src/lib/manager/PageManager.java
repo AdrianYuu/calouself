@@ -4,8 +4,8 @@ import config.AppConfig;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import view.auth.LoginPage;
-import view.base.Page;
+import view.page.auth.LoginPage;
+import view.page.base.Page;
 
 import java.util.Objects;
 

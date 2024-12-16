@@ -1,4 +1,4 @@
-package view.base;
+package view.page.base;
 
 import interfaces.IComponent;
 import interfaces.IMiddleware;
