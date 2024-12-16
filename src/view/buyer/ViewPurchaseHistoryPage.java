@@ -2,7 +2,6 @@ package view.buyer;
 
 import config.AppConfig;
 import controller.TransactionController;
-import controller.WishlistController;
 import enums.UserRole;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -13,7 +12,6 @@ import javafx.scene.layout.VBox;
 import lib.manager.PageManager;
 import lib.manager.SessionManager;
 import lib.response.Response;
-import view.HomePage;
 import view.auth.LoginPage;
 import view.base.Page;
 import view.component.navbar.NavigationBar;
@@ -21,7 +19,7 @@ import viewmodel.PurchaseHistoryViewModel;
 
 import java.util.List;
 
-public class ViewPurchaseHistoryPage extends Page {
+public final class ViewPurchaseHistoryPage extends Page {
     private final TransactionController transactionController;
 
     private VBox container;

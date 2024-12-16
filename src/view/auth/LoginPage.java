@@ -1,7 +1,6 @@
 package view.auth;
 
 import controller.UserController;
-import enums.UserRole;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
