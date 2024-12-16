@@ -3,7 +3,7 @@ package viewmodel;
 import model.Item;
 import model.Transaction;
 
-public class PurchaseHistoryViewModel {
+public final class PurchaseHistoryViewModel {
     private Transaction transaction;
     private Item item;
 

@@ -1,22 +1,22 @@
 package view.seller;
 
 import config.AppConfig;
-import controller.ItemController;
 import controller.OfferController;
+import enums.UserRole;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
+import lib.manager.PageManager;
 import lib.manager.SessionManager;
 import lib.response.Response;
-import model.Item;
 import model.Offer;
 import utils.AlertHelper;
+import view.auth.LoginPage;
 import view.base.Page;
 import view.component.navbar.NavigationBar;
 import viewmodel.OfferViewModel;
@@ -24,8 +24,8 @@ import viewmodel.OfferViewModel;
 import java.util.List;
 import java.util.Optional;
 
-public class ItemOffersPage extends Page {
-    private final ItemController itemController;
+public final class OfferItemPage extends Page {
+
     private final OfferController offerController;
 
     private ObservableList<OfferViewModel> offers;
@@ -34,7 +34,7 @@ public class ItemOffersPage extends Page {
 
     private Label pageLbl;
 
-    private TableView offerTV;
+    private TableView<OfferViewModel> offerTV;
     private TableColumn<OfferViewModel, String> nameColumn;
     private TableColumn<OfferViewModel, String> categoryColumn;
     private TableColumn<OfferViewModel, String> sizeColumn;
@@ -42,54 +42,66 @@ public class ItemOffersPage extends Page {
     private TableColumn<OfferViewModel, String> offeredPriceColumn;
     private TableColumn<OfferViewModel, Void> actionsColumn;
 
-
-    private TextInputDialog declineTD;
+    private TextInputDialog declineTID;
 
     @Override
     public void init() {
         Response<List<OfferViewModel>> response = offerController.viewPendingOffers(SessionManager.getCurrentUser().getUserId());
-
-        if (response.isSuccess()) {
-            offers = FXCollections.observableArrayList(response.getData());
-        }
-        else {
-            offers = FXCollections.emptyObservableList();
-        }
+        offers = response.isSuccess() ? FXCollections.observableArrayList(response.getData()) : FXCollections.emptyObservableList();
 
         container = new VBox();
-
         pageLbl = new Label("Item Offers");
 
         offerTV = new TableView<>();
 
-        declineTD = new TextInputDialog();
-
-        declineTD.setTitle("Decline Reason");
-        declineTD.setContentText("Enter decline reason:");
-        declineTD.setHeaderText("");
-        declineTD.setGraphic(null);
-
         nameColumn = new TableColumn<>("Name");
-        nameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getItem().getItemName()));
-
         sizeColumn = new TableColumn<>("Size");
-        sizeColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getItem().getItemSize()));
-
         categoryColumn = new TableColumn<>("Category");
-        categoryColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getItem().getItemCategory()));
-
         initialPriceColumn = new TableColumn<>("Initial Price");
-        initialPriceColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getItem().getItemPrice().toString()));
-
         offeredPriceColumn = new TableColumn<>("Offered Price");
-        offeredPriceColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getOffer().getOfferPrice().toString()));
-
         actionsColumn = new TableColumn<>("Actions");
+
+        declineTID = new TextInputDialog();
+    }
+
+    @Override
+    public void setLayout() {
+        nameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getItem().getItemName()));
+        sizeColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getItem().getItemSize()));
+        categoryColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getItem().getItemCategory()));
+        initialPriceColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getItem().getItemPrice().toString()));
+        offeredPriceColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getOffer().getOfferPrice().toString()));
         actionsColumn.setCellFactory(createActionCellFactory());
 
-        offerTV.getColumns().addAll(nameColumn, sizeColumn, categoryColumn, initialPriceColumn, offeredPriceColumn, actionsColumn);
+        double tableWidth = AppConfig.SCREEN_WIDTH * 0.8;
 
+        offerTV.getColumns().addAll(nameColumn, sizeColumn, categoryColumn, initialPriceColumn, offeredPriceColumn, actionsColumn);
         offerTV.setItems(offers);
+        offerTV.getColumns().forEach(col -> {
+            ((TableColumn<?, ?>) col).setMinWidth(tableWidth / offerTV.getColumns().size());
+        });
+
+        declineTID.setTitle("Decline Reason");
+        declineTID.setContentText("Enter decline reason:");
+        declineTID.setHeaderText("");
+        declineTID.setGraphic(null);
+
+        container.getChildren().addAll(pageLbl, offerTV);
+        container.setSpacing(14);
+        container.setMaxWidth(tableWidth);
+        container.setPadding(new Insets(20, 0, 0, 0));
+
+        setTop(NavigationBar.getNavigationBar());
+        setCenter(container);
+    }
+
+    @Override
+    public void setStyle() {
+        pageLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 32px; -fx-font-weight: bolder;");
+    }
+
+    @Override
+    public void setEvent() {
     }
 
     private Callback<TableColumn<OfferViewModel, Void>, TableCell<OfferViewModel, Void>> createActionCellFactory() {
@@ -118,7 +130,7 @@ public class ItemOffersPage extends Page {
                         declineBtn.setOnAction(event -> {
                             OfferViewModel offerVM = getTableView().getItems().get(getIndex());
 
-                            Optional<String> result = declineTD.showAndWait();
+                            Optional<String> result = declineTID.showAndWait();
 
                             result.ifPresent(reason -> {
                                 Response<Offer> response = offerController.declineOffer(offerVM.getOffer().getOfferId(), reason);
@@ -150,43 +162,22 @@ public class ItemOffersPage extends Page {
         };
     }
 
-    @Override
-    public void setLayout() {
-        setTop(NavigationBar.getNavigationBar());
-        container.getChildren().addAll(pageLbl, offerTV);
-        container.setSpacing(14);
+    private static OfferItemPage instance;
 
-        double tableWidth = AppConfig.SCREEN_WIDTH * 0.8;
-
-        container.setMaxWidth(tableWidth);
-        container.setPadding(new Insets(20, 0, 0, 0));
-        setCenter(container);
-
-        offerTV.getColumns().forEach(col -> {
-            ((TableColumn<?, ?>) col).setMinWidth(tableWidth / offerTV.getColumns().size());
-        });
+    public static OfferItemPage getInstance() {
+        return instance = (instance == null) ? new OfferItemPage() : instance;
     }
 
-    @Override
-    public void setStyle() {
-        pageLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 32px; -fx-font-weight: bolder;");
-    }
-
-    @Override
-    public void setEvent() {
-
-    }
-
-    private static ItemOffersPage instance;
-
-    public static ItemOffersPage getInstance() {
-        return instance = (instance == null) ? new ItemOffersPage() : instance;
-    }
-
-    private ItemOffersPage() {
-        itemController = ItemController.getInstance();
-        offerController = OfferController.getInstance();
-
+    private OfferItemPage() {
+        this.offerController = OfferController.getInstance();
         createOrRefreshPage();
     }
+
+    @Override
+    public void check() {
+        if(SessionManager.getCurrentUser() == null || !SessionManager.getCurrentUser().getRole().equals(UserRole.SELLER)){
+            PageManager.changePage(LoginPage.getInstance(), "Login Page");
+        }
+    }
+
 }

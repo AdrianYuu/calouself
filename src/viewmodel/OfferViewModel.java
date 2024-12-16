@@ -3,7 +3,7 @@ package viewmodel;
 import model.Item;
 import model.Offer;
 
-public class OfferViewModel {
+public final class OfferViewModel {
     private Offer offer;
     private Item item;
 
@@ -19,4 +19,5 @@ public class OfferViewModel {
     public Item getItem() {
         return item;
     }
+
 }

@@ -1,6 +1,5 @@
 package model;
 
-import enums.ItemStatus;
 import enums.OfferStatus;
 import lib.db.Connect;
 
@@ -17,7 +16,6 @@ public final class Offer {
     private OfferStatus offerStatus;
     private String declineReason;
 
-
     public Offer(String offerId, String itemId, String buyerId, Integer offerPrice, OfferStatus offerStatus, String declineReason) {
         this.offerId = offerId;
         this.itemId = itemId;
@@ -25,11 +23,6 @@ public final class Offer {
         this.offerPrice = offerPrice;
         this.offerStatus = offerStatus;
         this.declineReason = declineReason;
-    }
-
-    public static boolean create(String itemId, String buyerId, Integer offerPrice, OfferStatus offerStatus) {
-        String query = "INSERT INTO offers (item_id, buyer_id, offer_price, offer_status) VALUES (?, ?, ?, ?)";
-        return Connect.getConnection().executePreparedUpdate(query, itemId, buyerId, offerPrice, offerStatus.name());
     }
 
     public static List<Offer> getAll() {
@@ -43,9 +36,9 @@ public final class Offer {
             while (rs.next()) {
                 offers.add(
                         new Offer(
-                                rs.getString("offer_id"),
-                                rs.getString("item_id"),
-                                rs.getString("buyer_id"),
+                                String.valueOf(rs.getInt("offer_id")),
+                                String.valueOf(rs.getInt("item_id")),
+                                String.valueOf(rs.getInt("buyer_id")),
                                 rs.getInt("offer_price"),
                                 OfferStatus.valueOf(rs.getString("offer_status")),
                                 rs.getString("decline_reason")
@@ -57,6 +50,29 @@ public final class Offer {
         }
 
         return offers;
+    }
+
+    public static Offer getById(String offerId) {
+        String query = "SELECT * FROM offers WHERE offer_id = ? LIMIT 1";
+
+        try {
+            ResultSet rs = Connect.getConnection().executePreparedQuery(query, offerId);
+
+            if (rs.next()) {
+                return new Offer(
+                        rs.getString("offer_id"),
+                        rs.getString("item_id"),
+                        rs.getString("buyer_id"),
+                        rs.getInt("offer_price"),
+                        OfferStatus.valueOf(rs.getString("offer_status")),
+                        rs.getString("decline_reason")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     public static List<Offer> getByItemId(String itemId) {
@@ -86,27 +102,10 @@ public final class Offer {
 
         return offers;
     }
-    public static Offer getById(String offerId) {
-        String query = "SELECT * FROM offers WHERE offer_id = ? LIMIT 1";
 
-        try {
-            ResultSet rs = Connect.getConnection().executePreparedQuery(query, offerId);
-
-            if (rs.next()) {
-                return new Offer(
-                        rs.getString("offer_id"),
-                        rs.getString("item_id"),
-                        rs.getString("buyer_id"),
-                        rs.getInt("offer_price"),
-                        OfferStatus.valueOf(rs.getString("offer_status")),
-                        rs.getString("decline_reason")
-                );
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+    public static boolean create(String itemId, String buyerId, Integer offerPrice, OfferStatus offerStatus) {
+        String query = "INSERT INTO offers (item_id, buyer_id, offer_price, offer_status) VALUES (?, ?, ?, ?)";
+        return Connect.getConnection().executePreparedUpdate(query, itemId, buyerId, offerPrice, offerStatus.name());
     }
 
     public static boolean update(String offerId, String itemId, String buyerId, Integer offerPrice, OfferStatus offerStatus, String declineReason) {
@@ -145,7 +144,4 @@ public final class Offer {
         return declineReason;
     }
 
-    public void setDeclineReason(String declineReason) {
-        this.declineReason = declineReason;
-    }
 }

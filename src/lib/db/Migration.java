@@ -49,7 +49,7 @@ public final class Migration {
                 "item_status VARCHAR(100)," +
                 "decline_reason VARCHAR(100)," +
                 "seller_id INT," +
-                "FOREIGN KEY (seller_id) REFERENCES users(user_id)" +
+                "FOREIGN KEY (seller_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE" +
                 ")";
         Connect.getConnection().executeUpdate(query);
     }
@@ -62,8 +62,8 @@ public final class Migration {
                 "offer_price INT," +
                 "offer_status VARCHAR(100)," +
                 "decline_reason VARCHAR(100)," +
-                "FOREIGN KEY (item_id) REFERENCES items(item_id)," +
-                "FOREIGN KEY (buyer_id) REFERENCES users(user_id)" +
+                "FOREIGN KEY (item_id) REFERENCES items(item_id) ON UPDATE CASCADE ON DELETE CASCADE," +
+                "FOREIGN KEY (buyer_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE" +
                 ")";
         Connect.getConnection().executeUpdate(query);
     }
@@ -73,20 +73,20 @@ public final class Migration {
                 "transaction_id INT PRIMARY KEY AUTO_INCREMENT," +
                 "user_id INT," +
                 "item_id INT," +
-                "FOREIGN KEY (user_id) REFERENCES users(user_id)," +
-                "FOREIGN KEY (item_id) REFERENCES items(item_id)" +
+                "FOREIGN KEY (user_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE," +
+                "FOREIGN KEY (item_id) REFERENCES items(item_id) ON UPDATE CASCADE ON DELETE CASCADE" +
                 ")";
         Connect.getConnection().executeUpdate(query);
     }
 
     private static void createWishlistsTable() {
         String query = "CREATE TABLE wishlists (" +
-                            "wishlist_id INT PRIMARY KEY AUTO_INCREMENT," +
-                            "user_id INT," +
-                            "item_id INT," +
-                            "FOREIGN KEY (user_id) REFERENCES users(user_id)," +
-                            "FOREIGN KEY (item_id) REFERENCES items(item_id)" +
-                        ")";
+                "wishlist_id INT PRIMARY KEY AUTO_INCREMENT," +
+                "user_id INT," +
+                "item_id INT," +
+                "FOREIGN KEY (user_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE," +
+                "FOREIGN KEY (item_id) REFERENCES items(item_id) ON UPDATE CASCADE ON DELETE CASCADE" +
+                ")";
         Connect.getConnection().executeUpdate(query);
     }
 

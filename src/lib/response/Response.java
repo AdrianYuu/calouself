@@ -11,16 +11,16 @@ public final class Response<T> {
         this.data = data;
     }
 
+    public static <T> Response<T> Success(String message) {
+        return new Response<T>(true, message, null);
+    }
+
     public static <T> Response<T> Success(T data) {
         return new Response<T>(true, null, data);
     }
 
     public static <T> Response<T> Success(String message, T data) {
         return new Response<T>(true, message, data);
-    }
-
-    public static <T> Response<T> Failed(String message, T data) {
-        return new Response<T>(false, message, data);
     }
 
     public static <T> Response<T> Failed(String message) {

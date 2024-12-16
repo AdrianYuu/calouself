@@ -1,5 +1,6 @@
 package view.component.navbar;
 
+import config.AppConfig;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import lib.manager.PageManager;
@@ -10,7 +11,7 @@ import view.auth.LoginPage;
 
 public final class AdminNavigationBar extends NavigationBar {
 
-    private Menu homeMn;
+    private Menu mainMn;
     private MenuItem homeMi;
     private MenuItem logoutMi;
 
@@ -19,7 +20,7 @@ public final class AdminNavigationBar extends NavigationBar {
 
     @Override
     public void init() {
-        homeMn = new Menu("Home");
+        mainMn = new Menu(AppConfig.APP_NAME);
         itemMn = new Menu("Item");
 
         homeMi = new MenuItem("Home");
@@ -29,14 +30,13 @@ public final class AdminNavigationBar extends NavigationBar {
 
     @Override
     public void setLayout() {
-        homeMn.getItems().addAll(homeMi, logoutMi);
+        mainMn.getItems().addAll(homeMi, logoutMi);
         itemMn.getItems().add(viewRequestedItemMi);
-        getMenus().addAll(homeMn, itemMn);
+        getMenus().addAll(mainMn, itemMn);
     }
 
     @Override
     public void setStyle() {
-
     }
 
     @Override

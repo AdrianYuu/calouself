@@ -5,28 +5,24 @@ import model.Item;
 import model.Wishlist;
 import viewmodel.WishlistViewModel;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
 
 public final class WishlistController {
 
-    private static WishlistController instance;
-
-    public static WishlistController getInstance() {
-        return instance = (instance == null) ? new WishlistController() : instance;
-    }
-
-    private WishlistController() {
-    }
-
     public Response<Wishlist> addWishlist(String userId, String itemId) {
         List<Wishlist> wishlists = Wishlist.getByUserId(userId);
 
-        for(Wishlist wishlist : wishlists){
-            if(wishlist.getItemId().equals(itemId)){
+        for (Wishlist wishlist : wishlists) {
+            if (wishlist.getItemId().equals(itemId)) {
                 return Response.Failed("Already wishlist this item.");
             }
+        }
+
+        Item item = Item.getById(itemId);
+
+        if (item == null) {
+            return Response.Failed("Item not found");
         }
 
         boolean isSuccess = Wishlist.create(userId, itemId);
@@ -35,36 +31,54 @@ public final class WishlistController {
             return Response.Failed("Failed to create wishlist.");
         }
 
-        return Response.Success("Successfully create wishlist.", null);
+        return Response.Success("Successfully create wishlist.");
     }
 
     public Response<List<WishlistViewModel>> viewWishlist(String userId) {
-        ItemController itemController = ItemController.getInstance();
         List<Wishlist> wishlists = Wishlist.getByUserId(userId);
-        List<WishlistViewModel> wishlistsVM = new ArrayList<>();
 
-        if(wishlists.isEmpty()){
+        if (wishlists.isEmpty()) {
             return Response.Failed("There is no wishlists.");
         }
 
-        for(Wishlist wishlist : wishlists){
-            Response<Item> response = itemController.getById(wishlist.getItemId());
-            if(!response.isSuccess()) continue;
-            Item item = response.getData();
+        List<WishlistViewModel> wishlistsVM = new ArrayList<>();
+
+        for (Wishlist wishlist : wishlists) {
+            Item item = Item.getById(wishlist.getItemId());
+
+            if (item == null) {
+                continue;
+            }
+
             wishlistsVM.add(new WishlistViewModel(wishlist, item));
         }
 
-        return Response.Success("Successfully get wishlists.", wishlistsVM);
+        return Response.Success(wishlistsVM);
     }
 
-    public Response<Wishlist> removeWishlist(String wishlistId){
+    public Response<Wishlist> removeWishlist(String wishlistId) {
+        Wishlist wishlist = Wishlist.getById(wishlistId);
+
+        if (wishlist == null) {
+            return Response.Failed("Wishlist does not exists.");
+        }
+
         boolean isSuccess = Wishlist.delete(wishlistId);
 
-        if(!isSuccess){
+        if (!isSuccess) {
             return Response.Failed("Failed to remove wishlist.");
         }
 
         return Response.Success("Successfully removed wishlist.", null);
+    }
+
+    private static WishlistController instance;
+
+    public static WishlistController getInstance() {
+        return instance = (instance == null) ? new WishlistController() : instance;
+    }
+
+    private WishlistController() {
     }
 
 }

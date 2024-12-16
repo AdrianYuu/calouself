@@ -2,6 +2,8 @@ package view.admin;
 
 import config.AppConfig;
 import controller.ItemController;
+import enums.UserRole;
+import interfaces.IMiddleware;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -12,9 +14,12 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
+import lib.manager.PageManager;
+import lib.manager.SessionManager;
 import lib.response.Response;
 import model.Item;
 import utils.AlertHelper;
+import view.auth.LoginPage;
 import view.base.Page;
 import view.component.navbar.NavigationBar;
 
@@ -24,13 +29,11 @@ import java.util.Optional;
 public class RequestPage extends Page {
 
     private final ItemController itemController;
-    private ObservableList<Item> items;
 
     private VBox container;
-
     private Label pageLbl;
 
-    private TableView itemTV;
+    private TableView<Item> itemTV;
     private TableColumn<Item, String> nameColumn;
     private TableColumn<Item, String> sizeColumn;
     private TableColumn<Item, Integer> priceColumn;
@@ -38,74 +41,59 @@ public class RequestPage extends Page {
     private TableColumn<Item, String> statusColumn;
     private TableColumn<Item, Void> actionsColumn;
 
+    private TextInputDialog declineTID;
 
-    private TextInputDialog declineTD;
+    private ObservableList<Item> items;
 
     @Override
     public void init() {
         Response<List<Item>> response = itemController.viewRequestedItems();
-
-        if (response.isSuccess()) {
-            items = FXCollections.observableArrayList(response.getData());
-        }
-        else {
-            items = FXCollections.emptyObservableList();
-        }
+        items = response.isSuccess() ? FXCollections.observableArrayList(response.getData()) : FXCollections.emptyObservableList();
 
         container = new VBox();
-
         pageLbl = new Label("Item Requests");
 
         itemTV = new TableView<>();
 
-        declineTD = new TextInputDialog();
-
-        declineTD.setTitle("Decline Reason");
-        declineTD.setContentText("Enter decline reason:");
-        declineTD.setHeaderText("");
-        declineTD.setGraphic(null);
-
-        TableColumn<Item, String> nameColumn = new TableColumn<>("Name");
-
         nameColumn = new TableColumn<>("Name");
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("itemName"));
-
         sizeColumn = new TableColumn<>("Size");
-        sizeColumn.setCellValueFactory(new PropertyValueFactory<>("itemSize"));
-
         priceColumn = new TableColumn<>("Price");
-        priceColumn.setCellValueFactory(new PropertyValueFactory<>("itemPrice"));
-
         categoryColumn = new TableColumn<>("Category");
-        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("itemCategory"));
-
         statusColumn = new TableColumn<>("Status");
-        statusColumn.setCellValueFactory(new PropertyValueFactory<>("itemStatus"));
-
         actionsColumn = new TableColumn<>("Actions");
-        actionsColumn.setCellFactory(createActionCellFactory());
 
-        itemTV.getColumns().addAll(nameColumn, sizeColumn, priceColumn, categoryColumn, statusColumn, actionsColumn);
-
-        itemTV.setItems(items);
-
-
+        declineTID = new TextInputDialog();
     }
 
     @Override
     public void setLayout() {
-        setTop(NavigationBar.getNavigationBar());
-        container.getChildren().addAll(pageLbl, itemTV);
-        container.setSpacing(14);
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("itemName"));
+        sizeColumn.setCellValueFactory(new PropertyValueFactory<>("itemSize"));
+        priceColumn.setCellValueFactory(new PropertyValueFactory<>("itemPrice"));
+        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("itemCategory"));
+        statusColumn.setCellValueFactory(new PropertyValueFactory<>("itemStatus"));
+        actionsColumn.setCellFactory(createActionCellFactory());
 
         double tableWidth = AppConfig.SCREEN_WIDTH * 0.8;
 
-        container.setMaxWidth(tableWidth);
-        container.setPadding(new Insets(20, 0, 0, 0));
-        setCenter(container);
+        itemTV.getColumns().addAll(nameColumn, sizeColumn, priceColumn, categoryColumn, statusColumn, actionsColumn);
+        itemTV.setItems(items);
         itemTV.getColumns().forEach(col -> {
             ((TableColumn<?, ?>) col).setMinWidth(tableWidth / itemTV.getColumns().size());
         });
+
+        container.getChildren().addAll(pageLbl, itemTV);
+        container.setSpacing(14);
+        container.setMaxWidth(tableWidth);
+        container.setPadding(new Insets(20, 0, 0, 0));
+
+        declineTID.setTitle("Decline Reason");
+        declineTID.setContentText("Enter decline reason:");
+        declineTID.setHeaderText("");
+        declineTID.setGraphic(null);
+
+        setTop(NavigationBar.getNavigationBar());
+        setCenter(container);
     }
 
     @Override
@@ -115,7 +103,6 @@ public class RequestPage extends Page {
 
     @Override
     public void setEvent() {
-
     }
 
     private Callback<TableColumn<Item, Void>, TableCell<Item, Void>> createActionCellFactory() {
@@ -140,11 +127,10 @@ public class RequestPage extends Page {
                             createOrRefreshPage();
                         });
 
-
                         declineBtn.setOnAction(event -> {
                             Item item = getTableView().getItems().get(getIndex());
 
-                            Optional<String> result = declineTD.showAndWait();
+                            Optional<String> result = declineTID.showAndWait();
 
                             result.ifPresent(reason -> {
                                 Response<Item> response = itemController.declineItem(item.getItemId(), reason);
@@ -183,8 +169,14 @@ public class RequestPage extends Page {
     }
 
     private RequestPage() {
-        itemController = ItemController.getInstance();
+        this.itemController = ItemController.getInstance();
         createOrRefreshPage();
     }
 
+    @Override
+    public void check() {
+        if(SessionManager.getCurrentUser() == null || !SessionManager.getCurrentUser().getRole().equals(UserRole.ADMIN)){
+            PageManager.changePage(LoginPage.getInstance(), "Login Page");
+        }
+    }
 }

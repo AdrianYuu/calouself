@@ -1,5 +1,6 @@
 package view.component.navbar;
 
+import config.AppConfig;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import lib.manager.PageManager;
@@ -11,7 +12,7 @@ import view.buyer.ViewWishlistPage;
 
 public final class BuyerNavigationBar extends NavigationBar {
 
-    private Menu homeMn;
+    private Menu mainMn;
     private MenuItem homeMi;
     private MenuItem logoutMi;
 
@@ -23,7 +24,7 @@ public final class BuyerNavigationBar extends NavigationBar {
 
     @Override
     public void init() {
-        homeMn = new Menu("Home");
+        mainMn = new Menu(AppConfig.APP_NAME);
         wishlistMn = new Menu("Wishlist");
         historyMn = new Menu("History");
 
@@ -35,15 +36,14 @@ public final class BuyerNavigationBar extends NavigationBar {
 
     @Override
     public void setLayout() {
-        homeMn.getItems().addAll(homeMi, logoutMi);
+        mainMn.getItems().addAll(homeMi, logoutMi);
         wishlistMn.getItems().add(viewWishlistMi);
         historyMn.getItems().add(viewPurchaseHistoryMi);
-        getMenus().addAll(homeMn, wishlistMn, historyMn);
+        getMenus().addAll(mainMn, wishlistMn, historyMn);
     }
 
     @Override
     public void setStyle() {
-
     }
 
     @Override
@@ -72,6 +72,6 @@ public final class BuyerNavigationBar extends NavigationBar {
         return instance = (instance == null) ? new BuyerNavigationBar() : instance;
     }
 
-    private BuyerNavigationBar(){
+    private BuyerNavigationBar() {
     }
 }

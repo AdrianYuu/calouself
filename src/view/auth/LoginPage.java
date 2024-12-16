@@ -1,6 +1,7 @@
 package view.auth;
 
 import controller.UserController;
+import enums.UserRole;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -114,8 +115,15 @@ public final class LoginPage extends Page {
     }
 
     private LoginPage() {
+        this.userController = UserController.getInstance();
         createOrRefreshPage();
-        userController = UserController.getInstance();
+    }
+
+    @Override
+    public void check() {
+        if(SessionManager.getCurrentUser() != null){
+            PageManager.changePage(HomePage.getInstance(), "Home Page");
+        }
     }
 
 }

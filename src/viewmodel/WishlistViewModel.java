@@ -3,7 +3,7 @@ package viewmodel;
 import model.Item;
 import model.Wishlist;
 
-public class WishlistViewModel {
+public final class WishlistViewModel {
     private Wishlist wishlist;
     private Item item;
 
@@ -16,15 +16,8 @@ public class WishlistViewModel {
         return wishlist;
     }
 
-    public void setWishlist(Wishlist wishlist) {
-        this.wishlist = wishlist;
-    }
-
     public Item getItem() {
         return item;
     }
 
-    public void setItem(Item item) {
-        this.item = item;
-    }
 }

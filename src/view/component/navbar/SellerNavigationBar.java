@@ -1,17 +1,18 @@
 package view.component.navbar;
 
+import config.AppConfig;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import lib.manager.PageManager;
 import lib.manager.SessionManager;
 import view.HomePage;
 import view.auth.LoginPage;
-import view.seller.ItemOffersPage;
+import view.seller.OfferItemPage;
 import view.seller.UploadItemPage;
 
 public final class SellerNavigationBar extends NavigationBar {
 
-    private Menu homeMn;
+    private Menu mainMn;
     private MenuItem homeMi;
     private MenuItem logoutMi;
 
@@ -21,7 +22,7 @@ public final class SellerNavigationBar extends NavigationBar {
 
     @Override
     public void init() {
-        homeMn = new Menu("Home");
+        mainMn = new Menu(AppConfig.APP_NAME);
         itemMn = new Menu("Item");
 
         homeMi = new MenuItem("Home");
@@ -32,19 +33,18 @@ public final class SellerNavigationBar extends NavigationBar {
 
     @Override
     public void setLayout() {
-        homeMn.getItems().addAll(homeMi, logoutMi);
+        mainMn.getItems().addAll(homeMi, logoutMi);
         itemMn.getItems().addAll(uploadItemMi, viewItemOffers);
-        getMenus().addAll(homeMn, itemMn);
+        getMenus().addAll(mainMn, itemMn);
     }
 
     @Override
     public void setStyle() {
-
     }
 
     @Override
     public void setEvent() {
-        homeMn.setOnAction(e -> {
+        homeMi.setOnAction(e -> {
             PageManager.changePage(HomePage.getInstance(), "Home Page");
         });
 
@@ -53,7 +53,7 @@ public final class SellerNavigationBar extends NavigationBar {
         });
 
         viewItemOffers.setOnAction(e -> {
-            PageManager.changePage(ItemOffersPage.getInstance(), "Item Offers Page");
+            PageManager.changePage(OfferItemPage.getInstance(), "Item Offers Page");
         });
 
         logoutMi.setOnAction(e -> {
