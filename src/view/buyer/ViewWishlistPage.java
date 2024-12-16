@@ -23,7 +23,7 @@ import viewmodel.WishlistViewModel;
 
 import java.util.List;
 
-public class ViewWishlistPage extends Page {
+public final class ViewWishlistPage extends Page {
     private final WishlistController wishlistController;
 
     private VBox container;

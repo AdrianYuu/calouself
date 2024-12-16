@@ -3,7 +3,6 @@ package view.admin;
 import config.AppConfig;
 import controller.ItemController;
 import enums.UserRole;
-import interfaces.IMiddleware;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -26,7 +25,7 @@ import view.component.navbar.NavigationBar;
 import java.util.List;
 import java.util.Optional;
 
-public class RequestPage extends Page {
+public final class RequestPage extends Page {
 
     private final ItemController itemController;
 
