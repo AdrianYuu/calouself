@@ -14,4 +14,8 @@ public final class SessionManager {
         SessionManager.currentUser = currentUser;
     }
 
+    public static void logout(){
+        SessionManager.currentUser = null;
+    }
+
 }

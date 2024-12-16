@@ -8,9 +8,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import lib.manager.PageManager;
+import lib.manager.SessionManager;
 import lib.response.Response;
 import model.User;
 import utils.AlertHelper;
+import view.HomePage;
 import view.base.Page;
 
 import java.util.ArrayList;
@@ -162,6 +164,9 @@ public final class RegisterPage extends Page {
             return;
         }
 
+        errorLbl.setText("");
+        errorLbl.setVisible(false);
+
         AlertHelper.showInfo("Register Success", "Your new account is registered successfully.");
         navigateToLogin();
     }
@@ -173,8 +178,15 @@ public final class RegisterPage extends Page {
     }
 
     private RegisterPage() {
-        createOrRefreshPage();
         userController = UserController.getInstance();
+        createOrRefreshPage();
+    }
+
+    @Override
+    public void check() {
+        if(SessionManager.getCurrentUser() != null){
+            PageManager.changePage(HomePage.getInstance(), "Home Page");
+        }
     }
 
 }

@@ -1,15 +1,19 @@
 package view.seller;
 
 import controller.ItemController;
+import enums.UserRole;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import lib.manager.PageManager;
+import lib.manager.SessionManager;
 import lib.response.Response;
 import model.Item;
 import utils.AlertHelper;
+import view.auth.LoginPage;
 import view.base.Page;
 import view.component.navbar.NavigationBar;
 
@@ -18,7 +22,6 @@ public final class UploadItemPage extends Page {
     private final ItemController itemController;
 
     private VBox container;
-
     private Label pageLbl;
 
     private VBox itemNameContainer;
@@ -43,10 +46,7 @@ public final class UploadItemPage extends Page {
 
     @Override
     public void init() {
-        setTop(NavigationBar.getNavigationBar());
-
         container = new VBox();
-
         pageLbl = new Label("Upload Item");
 
         itemNameContainer = new VBox();
@@ -72,6 +72,7 @@ public final class UploadItemPage extends Page {
 
     @Override
     public void setLayout() {
+        setTop(NavigationBar.getNavigationBar());
         itemNameContainer.getChildren().addAll(itemNameLbl, itemNameTf);
         itemCategoryContainer.getChildren().addAll(itemCategoryLbl, itemCategoryTf);
         itemSizeContainer.getChildren().addAll(itemSizeLbl, itemSizeTf);
@@ -119,7 +120,7 @@ public final class UploadItemPage extends Page {
         errorLbl.setText("");
         errorLbl.setVisible(false);
 
-        AlertHelper.showInfo("Upload Item Success", "Your item is uploaded successfully.");
+        AlertHelper.showInfo("Upload Item", "Your item is uploaded successfully.");
         createOrRefreshPage();
     }
 
@@ -130,7 +131,15 @@ public final class UploadItemPage extends Page {
     }
 
     private UploadItemPage() {
+        this.itemController = ItemController.getInstance();
         createOrRefreshPage();
-        itemController = ItemController.getInstance();
     }
+
+    @Override
+    public void check() {
+        if(SessionManager.getCurrentUser() == null || !SessionManager.getCurrentUser().getRole().equals(UserRole.SELLER)){
+            PageManager.changePage(LoginPage.getInstance(), "Login Page");
+        }
+    }
+
 }

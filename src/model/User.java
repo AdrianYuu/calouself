@@ -24,9 +24,27 @@ public final class User {
         this.role = role;
     }
 
-    public static boolean create(String username, String password, String phoneNumber, String address, UserRole role) {
-        String query = "INSERT INTO users (username, password, phone_number, address, role) VALUES (?, ?, ?, ?, ?)";
-        return Connect.getConnection().executePreparedUpdate(query, username, password, phoneNumber, address, role.name());
+    public static User getById(String userId){
+        String query = "SELECT * FROM users WHERE user_id = ? LIMIT 1";
+
+        try {
+            ResultSet rs = Connect.getConnection().executePreparedQuery(query, userId);
+
+            if (rs.next()) {
+                return new User(
+                        String.valueOf(rs.getInt("user_id")),
+                        rs.getString("username"),
+                        rs.getString("password"),
+                        rs.getString("phone_number"),
+                        rs.getString("address"),
+                        UserRole.valueOf(rs.getString("role"))
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     public static User getByUsername(String username) {
@@ -50,6 +68,11 @@ public final class User {
         }
 
         return null;
+    }
+
+    public static boolean create(String username, String password, String phoneNumber, String address, UserRole role) {
+        String query = "INSERT INTO users (username, password, phone_number, address, role) VALUES (?, ?, ?, ?, ?)";
+        return Connect.getConnection().executePreparedUpdate(query, username, password, phoneNumber, address, role.name());
     }
 
     public String getUserId() {

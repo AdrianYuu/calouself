@@ -4,10 +4,10 @@ import config.AppConfig;
 import controller.ItemController;
 import controller.OfferController;
 import controller.TransactionController;
+import controller.WishlistController;
 import enums.UserRole;
 import interfaces.IComponent;
 import javafx.geometry.Insets;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
@@ -20,6 +20,7 @@ import lib.response.Response;
 import model.Item;
 import model.Offer;
 import model.Transaction;
+import model.Wishlist;
 import utils.AlertHelper;
 import view.HomePage;
 import view.seller.EditItemPage;
@@ -31,9 +32,7 @@ public final class ItemCard extends BorderPane implements IComponent {
     private final ItemController itemController;
     private final TransactionController transactionController;
     private final OfferController offerController;
-
-    private final Item item;
-    private final boolean isOwner;
+    private final WishlistController wishlistController;
 
     private VBox container;
 
@@ -47,10 +46,14 @@ public final class ItemCard extends BorderPane implements IComponent {
     private Button deleteBtn;
     private Button buyBtn;
     private Button offerBtn;
+    private Button wishlistBtn;
 
-    private TextInputDialog offerTD;
+    private TextInputDialog offerTID;
 
     private HBox bottomContainer;
+
+    private final Item item;
+    private final boolean isOwner;
 
     @Override
     public void init() {
@@ -66,11 +69,9 @@ public final class ItemCard extends BorderPane implements IComponent {
             deleteBtn = new Button("Delete");
         } else if (SessionManager.getCurrentUser().getRole() != UserRole.ADMIN) {
             buyBtn = new Button("Buy");
-            offerBtn = new Button("Make offer");
-            offerTD = new TextInputDialog();
-
-            offerTD.setHeaderText("");
-            offerTD.setTitle("Make offer");
+            offerBtn = new Button("Make Offer");
+            offerTID = new TextInputDialog();
+            wishlistBtn = new Button("Wishlist");
         }
 
         container = new VBox();
@@ -79,15 +80,19 @@ public final class ItemCard extends BorderPane implements IComponent {
     @Override
     public void setLayout() {
         container.getChildren().addAll(itemNameLbl, itemCategoryLbl, itemSizeLbl);
-        setCenter(container);
-        setBottom(bottomContainer);
-        bottomContainer.getChildren().addAll(itemPriceLbl, btnContainer);
+
+        bottomContainer.getChildren().addAll(btnContainer, itemPriceLbl);
 
         if (isOwner) {
             btnContainer.getChildren().addAll(editBtn, deleteBtn);
         } else if (SessionManager.getCurrentUser().getRole() != UserRole.ADMIN) {
-            btnContainer.getChildren().addAll(buyBtn, offerBtn);
+            btnContainer.getChildren().addAll(buyBtn, offerBtn, wishlistBtn);
+            offerTID.setHeaderText("");
+            offerTID.setTitle("Make Offer");
         }
+
+        setCenter(container);
+        setBottom(bottomContainer);
     }
 
     @Override
@@ -95,7 +100,6 @@ public final class ItemCard extends BorderPane implements IComponent {
         setPrefSize(AppConfig.ITEM_CARD_WIDTH, AppConfig.ITEM_CARD_HEIGHT);
         setPadding(new Insets(10));
         setStyle(
-                "-fx-background-color: white;" +
                         "-fx-background-radius: 10px;" +
                         "-fx-border-color: #E0E0E0;" +
                         "-fx-border-width: 1px;" +
@@ -139,20 +143,30 @@ public final class ItemCard extends BorderPane implements IComponent {
                 buy();
             });
 
-            offerBtn.setOnMouseClicked(evt -> {
+            offerBtn.setOnMouseClicked(e -> {
                 makeOffer();
+            });
+
+            wishlistBtn.setOnMouseClicked(e -> {
+                wishlist();
             });
         }
     }
 
     private void delete() {
         boolean isConfirmed = AlertHelper.showConfirmation("Item Deletion", "Are you sure want to delete this item?");
-        if (!isConfirmed) return;
+
+        if (!isConfirmed) {
+            return;
+        }
+
         Response<Item> response = itemController.deleteItem(item.getItemId());
+
         if (!response.isSuccess()) {
             AlertHelper.showError("Item Deletion", response.getMessage());
             return;
         }
+
         AlertHelper.showInfo("Item Deletion", response.getMessage());
         HomePage.getInstance().createOrRefreshPage();
     }
@@ -161,50 +175,62 @@ public final class ItemCard extends BorderPane implements IComponent {
         Response<Offer> highestOfferResponse = offerController.getItemHighestOffer(item.getItemId());
 
         if (!highestOfferResponse.isSuccess()) {
-            AlertHelper.showError("Operation failed", "Cannot get highest offer, please try again later.");
+            AlertHelper.showError("Operation Failed", "Cannot get highest offer, please try again later.");
             return;
         }
 
         Offer highestOffer = highestOfferResponse.getData();
 
-        offerTD.setContentText(String.format("Input your offer (Highest offer: %d): ", highestOffer == null ? 0 : highestOffer.getOfferPrice()));
+        offerTID.setContentText(String.format("Input your offer (highest offer: %d): ", highestOffer == null ? 0 : highestOffer.getOfferPrice()));
 
-        Optional<String> result = offerTD.showAndWait();
+        Optional<String> result = offerTID.showAndWait();
 
         result.ifPresent(input -> {
-            System.out.println(input);
-            if (input.isBlank()) {
-                AlertHelper.showError("Invalid Input", "Input cannot be empty");
+            Response<Offer> response = offerController.createOffer(item.getItemId(), SessionManager.getCurrentUser().getUserId(), input);
+
+            if (!response.isSuccess()) {
+                AlertHelper.showError("Invalid Input", response.getMessage());
                 return;
             }
 
-            try {
-                int offerPrice = Integer.parseInt(input);
-                Response<Offer> response =  offerController.createOffer(item.getItemId(), SessionManager.getCurrentUser().getUserId(), offerPrice);
-
-                if (!response.isSuccess()) {
-                    AlertHelper.showError("Operation Failed", response.getMessage());
-                    return;
-                }
-
-                AlertHelper.showInfo("Operation Success", response.getMessage());
-
-            } catch (NumberFormatException e) {
-                AlertHelper.showError("Invalid Input", "Input must be a number");
-            }
+            AlertHelper.showInfo("Make Offer", response.getMessage());
+            offerTID.close();
         });
 
     }
 
     private void buy() {
         boolean isConfirmed = AlertHelper.showConfirmation("Item Buy", "Are you sure want to buy this item?");
-        if (!isConfirmed) return;
+
+        if (!isConfirmed) {
+            return;
+        }
+
         Response<Transaction> response = transactionController.purchaseItem(SessionManager.getCurrentUser().getUserId(), item.getItemId());
+
         if (!response.isSuccess()) {
             AlertHelper.showError("Item Buy", response.getMessage());
             return;
         }
+
         AlertHelper.showInfo("Item Buy", response.getMessage());
+    }
+
+    private void wishlist() {
+        boolean isConfirmed = AlertHelper.showConfirmation("Item Wishlist", "Are you sure want to wishlist this item?");
+
+        if (!isConfirmed) {
+            return;
+        }
+
+        Response<Wishlist> response = wishlistController.addWishlist(SessionManager.getCurrentUser().getUserId(), item.getItemId());
+
+        if (!response.isSuccess()) {
+            AlertHelper.showError("Item Wishlist", response.getMessage());
+            return;
+        }
+
+        AlertHelper.showInfo("Item Wishlist", response.getMessage());
     }
 
     public ItemCard(Item item, boolean isOwned) {
@@ -213,6 +239,7 @@ public final class ItemCard extends BorderPane implements IComponent {
         this.itemController = ItemController.getInstance();
         this.transactionController = TransactionController.getInstance();
         this.offerController = OfferController.getInstance();
+        this.wishlistController = WishlistController.getInstance();
         init();
         setLayout();
         setStyle();

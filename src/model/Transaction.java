@@ -18,11 +18,6 @@ public final class Transaction {
         this.itemId = itemId;
     }
 
-    public static boolean create(String userId, String itemId) {
-        String query = "INSERT INTO transactions (user_id, item_id) VALUES (?, ?)";
-        return Connect.getConnection().executePreparedUpdate(query, userId, itemId);
-    }
-
     public static List<Transaction> getByUserId(String userId) {
         String query = "SELECT * FROM transactions WHERE user_id = ?";
 
@@ -33,9 +28,9 @@ public final class Transaction {
             while (rs.next()) {
                 transactions.add(
                         new Transaction(
-                                String.valueOf(rs.getString("transaction_id")),
-                                String.valueOf(rs.getString("user_id")),
-                                String.valueOf(rs.getString("item_id"))
+                                String.valueOf(rs.getInt("transaction_id")),
+                                String.valueOf(rs.getInt("user_id")),
+                                String.valueOf(rs.getInt("item_id"))
                         )
                 );
             }
@@ -44,6 +39,11 @@ public final class Transaction {
         }
 
         return transactions;
+    }
+
+    public static boolean create(String userId, String itemId) {
+        String query = "INSERT INTO transactions (user_id, item_id) VALUES (?, ?)";
+        return Connect.getConnection().executePreparedUpdate(query, userId, itemId);
     }
 
     public String getTransactionId() {

@@ -18,16 +18,6 @@ public final class Item {
     private String declineReason;
     private String sellerId;
 
-    public Item(String itemId, String itemName, String itemSize, Integer itemPrice, String itemCategory, ItemStatus itemStatus, String sellerId) {
-        this.itemId = itemId;
-        this.itemName = itemName;
-        this.itemSize = itemSize;
-        this.itemPrice = itemPrice;
-        this.itemCategory = itemCategory;
-        this.itemStatus = itemStatus;
-        this.sellerId = sellerId;
-    }
-
     public Item(String itemId, String itemName, String itemSize, Integer itemPrice, String itemCategory, ItemStatus itemStatus, String declineReason, String sellerId) {
         this.itemId = itemId;
         this.itemName = itemName;
@@ -37,11 +27,6 @@ public final class Item {
         this.itemStatus = itemStatus;
         this.sellerId = sellerId;
         this.declineReason = declineReason;
-    }
-
-    public static boolean create(String itemName, String itemSize, Integer itemPrice, String itemCategory, ItemStatus itemStatus, String sellerId) {
-        String query = "INSERT INTO items (item_name, item_size, item_price, item_category, item_status, seller_id) VALUES (?, ?, ?, ?, ?, ?)";
-        return Connect.getConnection().executePreparedUpdate(query, itemName, itemSize, itemPrice, itemCategory, itemStatus.name(), Integer.parseInt(sellerId));
     }
 
     public static List<Item> getAll() {
@@ -61,7 +46,7 @@ public final class Item {
                                 rs.getString("item_category"),
                                 ItemStatus.valueOf(rs.getString("item_status")),
                                 rs.getString("decline_reason"),
-                                rs.getString("seller_id")
+                                String.valueOf(rs.getInt("seller_id"))
                         )
                 );
             }
@@ -87,7 +72,7 @@ public final class Item {
                         rs.getString("item_category"),
                         ItemStatus.valueOf(rs.getString("item_status")),
                         rs.getString("decline_reason"),
-                        rs.getString("seller_id")
+                        String.valueOf(rs.getInt("seller_id"))
                 );
             }
         } catch (SQLException e) {
@@ -95,6 +80,11 @@ public final class Item {
         }
 
         return null;
+    }
+
+    public static boolean create(String itemName, String itemSize, Integer itemPrice, String itemCategory, ItemStatus itemStatus, String sellerId) {
+        String query = "INSERT INTO items (item_name, item_size, item_price, item_category, item_status, seller_id) VALUES (?, ?, ?, ?, ?, ?)";
+        return Connect.getConnection().executePreparedUpdate(query, itemName, itemSize, itemPrice, itemCategory, itemStatus.name(), Integer.parseInt(sellerId));
     }
 
     public static boolean update(String itemId, String itemName, String itemSize, Integer itemPrice, String itemCategory, ItemStatus itemStatus, String declineReason, String sellerId) {

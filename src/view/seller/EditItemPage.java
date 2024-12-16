@@ -1,6 +1,7 @@
 package view.seller;
 
 import controller.ItemController;
+import enums.UserRole;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -8,20 +9,20 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import lib.manager.PageManager;
+import lib.manager.SessionManager;
 import lib.response.Response;
 import model.Item;
 import utils.AlertHelper;
 import view.HomePage;
+import view.auth.LoginPage;
 import view.base.Page;
 import view.component.navbar.NavigationBar;
 
 public final class EditItemPage extends Page {
 
     private final ItemController itemController;
-    private final Item item;
 
     private VBox container;
-
     private Label pageLbl;
 
     private VBox itemNameContainer;
@@ -44,13 +45,12 @@ public final class EditItemPage extends Page {
 
     private Button submitBtn;
 
+    private final Item item;
+
     @Override
     public void init() {
-        setTop(NavigationBar.getNavigationBar());
-
         container = new VBox();
-
-        pageLbl = new Label("Upload Item");
+        pageLbl = new Label("Edit Item");
 
         itemNameContainer = new VBox();
         itemNameLbl = new Label("Item name");
@@ -75,6 +75,7 @@ public final class EditItemPage extends Page {
 
     @Override
     public void setLayout() {
+        setTop(NavigationBar.getNavigationBar());
         itemNameContainer.getChildren().addAll(itemNameLbl, itemNameTf);
         itemCategoryContainer.getChildren().addAll(itemCategoryLbl, itemCategoryTf);
         itemSizeContainer.getChildren().addAll(itemSizeLbl, itemSizeTf);
@@ -96,7 +97,6 @@ public final class EditItemPage extends Page {
         errorLbl.setVisible(false);
 
         pageLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 20px; -fx-font-weight: bold");
-
     }
 
     @Override
@@ -124,7 +124,7 @@ public final class EditItemPage extends Page {
         errorLbl.setText("");
         errorLbl.setVisible(false);
 
-        AlertHelper.showInfo("Update Item Success", "Your item is updated successfully.");
+        AlertHelper.showInfo("Update Item", "Your item is updated successfully.");
         PageManager.changePage(HomePage.getInstance(), "Home Page");
     }
 
@@ -136,7 +136,15 @@ public final class EditItemPage extends Page {
 
     private EditItemPage(Item item) {
         this.item = item;
+        this.itemController = ItemController.getInstance();
         createOrRefreshPage();
-        itemController = ItemController.getInstance();
     }
+
+    @Override
+    public void check() {
+        if(SessionManager.getCurrentUser() == null || !SessionManager.getCurrentUser().getRole().equals(UserRole.SELLER)){
+            PageManager.changePage(LoginPage.getInstance(), "Login Page");
+        }
+    }
+
 }
