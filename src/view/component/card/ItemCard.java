@@ -67,7 +67,7 @@ public final class ItemCard extends BorderPane implements IComponent {
         if (isOwner) {
             editBtn = new Button("Edit");
             deleteBtn = new Button("Delete");
-        } else if (SessionManager.getCurrentUser().getRole() != UserRole.ADMIN) {
+        } else if (SessionManager.getCurrentUser().getRole() == UserRole.BUYER) {
             buyBtn = new Button("Buy");
             offerBtn = new Button("Make Offer");
             offerTID = new TextInputDialog();
@@ -85,7 +85,7 @@ public final class ItemCard extends BorderPane implements IComponent {
 
         if (isOwner) {
             btnContainer.getChildren().addAll(editBtn, deleteBtn);
-        } else if (SessionManager.getCurrentUser().getRole() != UserRole.ADMIN) {
+        } else if (SessionManager.getCurrentUser().getRole() == UserRole.BUYER) {
             btnContainer.getChildren().addAll(buyBtn, offerBtn, wishlistBtn);
             offerTID.setHeaderText("");
             offerTID.setTitle("Make Offer");
@@ -138,7 +138,7 @@ public final class ItemCard extends BorderPane implements IComponent {
             deleteBtn.setOnMouseClicked(e -> {
                 delete();
             });
-        } else if (SessionManager.getCurrentUser().getRole() != UserRole.ADMIN) {
+        } else if (SessionManager.getCurrentUser().getRole() == UserRole.BUYER) {
             buyBtn.setOnMouseClicked(e -> {
                 buy();
             });
