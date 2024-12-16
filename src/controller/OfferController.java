@@ -51,7 +51,7 @@ public final class OfferController {
 
         Offer highestOffer = null;
         for (Offer offer : offers) {
-            if (offer.getOfferStatus() != OfferStatus.ACCEPTED) {
+            if (offer.getOfferStatus() != OfferStatus.PENDING) {
                 continue;
             }
 
