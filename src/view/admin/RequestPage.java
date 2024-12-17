@@ -21,6 +21,7 @@ import utils.AlertHelper;
 import view.auth.LoginPage;
 import view.base.Page;
 import view.component.navbar.NavigationBar;
+import viewmodel.WishlistViewModel;
 
 import java.util.List;
 import java.util.Optional;
@@ -105,10 +106,10 @@ public final class RequestPage extends Page {
     }
 
     private Callback<TableColumn<Item, Void>, TableCell<Item, Void>> createActionCellFactory() {
-        return new Callback<>() {
+        return new Callback<TableColumn<Item, Void>, TableCell<Item, Void>>() {
             @Override
             public TableCell<Item, Void> call(final TableColumn<Item, Void> param) {
-                return new TableCell<>() {
+                return new TableCell<Item, Void>() {
                     private final Button approveBtn = new Button("Approve");
                     private final Button declineBtn = new Button("Decline");
 
