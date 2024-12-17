@@ -233,7 +233,7 @@ public final class ItemController {
 
         try {
             int price = Integer.parseInt(itemPrice);
-            if (price == 0) return "Price cannot be 0.";
+            if (price <= 0) return "Price cannot be 0.";
         } catch (NumberFormatException e) {
             return "Price must be a number.";
         }
