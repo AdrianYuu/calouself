@@ -33,11 +33,7 @@ public final class TransactionController {
             return Response.Failed("Item not found.");
         }
 
-        boolean isDeleted = Wishlist.deleteByItemId(itemId);
-
-        if (!isDeleted) {
-            return Response.Failed("Failed to delete wishlist.");
-        }
+        Wishlist.deleteByItemId(itemId);
 
         boolean isSuccess = Transaction.create(userId, itemId);
 
