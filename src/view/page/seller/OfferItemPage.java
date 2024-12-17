@@ -1,4 +1,4 @@
-package view.seller;
+package view.page.seller;
 
 import config.AppConfig;
 import controller.OfferController;
@@ -17,8 +17,8 @@ import lib.response.Response;
 import model.Item;
 import model.Offer;
 import utils.AlertHelper;
-import view.auth.LoginPage;
-import view.base.Page;
+import view.page.auth.LoginPage;
+import view.page.base.Page;
 import view.component.navbar.NavigationBar;
 import viewmodel.OfferViewModel;
 

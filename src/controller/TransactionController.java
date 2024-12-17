@@ -12,6 +12,14 @@ import java.util.List;
 
 public final class TransactionController {
 
+    /**
+     * Purchases an item for a user by creating a transaction. The item is removed
+     * from the user's wishlist if present.
+     *
+     * @param userId the ID of the user making the purchase
+     * @param itemId the ID of the item to be purchased
+     * @return a response indicating success or failure of the purchase process
+     */
     public Response<Transaction> purchaseItem(String userId, String itemId) {
         User user = User.getById(userId);
 
@@ -40,6 +48,13 @@ public final class TransactionController {
         return Response.Success("Successfully purchase item.");
     }
 
+    /**
+     * Retrieves the purchase history of a user. For each transaction, the associated
+     * item's details are included in the response.
+     *
+     * @param userId the ID of the user whose purchase history is to be retrieved
+     * @return a response containing a list of PurchaseHistoryViewModel or an error message
+     */
     public Response<List<PurchaseHistoryViewModel>> viewHistory(String userId) {
         List<Transaction> transactions = Transaction.getByUserId(userId);
 
@@ -68,6 +83,11 @@ public final class TransactionController {
 
     private static TransactionController instance;
 
+    /**
+     * Singleton implementation to get an instance of TransactionController.
+     *
+     * @return the single instance of TransactionController
+     */
     public static TransactionController getInstance() {
         return instance = (instance == null) ? new TransactionController() : instance;
     }

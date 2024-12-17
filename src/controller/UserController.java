@@ -7,6 +7,16 @@ import utils.StringHelper;
 
 public final class UserController {
 
+    /**
+     * Registers a new user with the provided details.
+     *
+     * @param username    the username for the new user
+     * @param password    the password for the new user
+     * @param phoneNumber the phone number of the user (must start with "+62")
+     * @param address     the address of the user
+     * @param role        the role of the user (must be BUYER or SELLER)
+     * @return a response indicating success or failure of the registration process
+     */
     public Response<User> register(String username, String password, String phoneNumber, String address, UserRole role) {
         String message = checkAccountValidation(username, password, phoneNumber, address, role);
 
@@ -23,6 +33,14 @@ public final class UserController {
         return Response.Success("Successfully register user.");
     }
 
+    /**
+     * Authenticates a user using their username and password.
+     * Supports an admin shortcut login with hardcoded credentials.
+     *
+     * @param username the username provided by the user
+     * @param password the password provided by the user
+     * @return a response containing the authenticated user or an error message
+     */
     public Response<User> login(String username, String password) {
         if (username.isBlank()) {
             return Response.Failed("Username can't be empty.");
@@ -49,6 +67,16 @@ public final class UserController {
         return Response.Success(user);
     }
 
+    /**
+     * Validates the inputs for account creation.
+     *
+     * @param username    the username to validate
+     * @param password    the password to validate
+     * @param phoneNumber the phone number to validate
+     * @param address     the address to validate
+     * @param role        the role to validate
+     * @return an error message if validation fails; otherwise, an empty string
+     */
     private String checkAccountValidation(String username, String password, String phoneNumber, String address, UserRole role) {
         if (username.isBlank()) {
             return "Username can't be empty.";
@@ -111,6 +139,11 @@ public final class UserController {
 
     private static UserController instance;
 
+    /**
+     * Provides a singleton instance of UserController.
+     *
+     * @return the singleton instance of UserController
+     */
     public static UserController getInstance() {
         return instance = (instance == null) ? new UserController() : instance;
     }

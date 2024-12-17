@@ -5,10 +5,10 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import lib.manager.PageManager;
 import lib.manager.SessionManager;
-import view.HomePage;
-import view.auth.LoginPage;
-import view.buyer.ViewPurchaseHistoryPage;
-import view.buyer.ViewWishlistPage;
+import view.page.HomePage;
+import view.page.auth.LoginPage;
+import view.page.buyer.ViewPurchaseHistoryPage;
+import view.page.buyer.ViewWishlistPage;
 
 public final class BuyerNavigationBar extends NavigationBar {
 

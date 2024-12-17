@@ -1,4 +1,4 @@
-package view.admin;
+package view.page.admin;
 
 import config.AppConfig;
 import controller.ItemController;
@@ -18,8 +18,8 @@ import lib.manager.SessionManager;
 import lib.response.Response;
 import model.Item;
 import utils.AlertHelper;
-import view.auth.LoginPage;
-import view.base.Page;
+import view.page.auth.LoginPage;
+import view.page.base.Page;
 import view.component.navbar.NavigationBar;
 import viewmodel.WishlistViewModel;
 

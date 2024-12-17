@@ -1,4 +1,4 @@
-package view.seller;
+package view.page.seller;
 
 import controller.ItemController;
 import enums.UserRole;
@@ -13,9 +13,9 @@ import lib.manager.SessionManager;
 import lib.response.Response;
 import model.Item;
 import utils.AlertHelper;
-import view.HomePage;
-import view.auth.LoginPage;
-import view.base.Page;
+import view.page.HomePage;
+import view.page.auth.LoginPage;
+import view.page.base.Page;
 import view.component.navbar.NavigationBar;
 
 public final class EditItemPage extends Page {

@@ -1,4 +1,4 @@
-package view.buyer;
+package view.page.buyer;
 
 import config.AppConfig;
 import controller.WishlistController;
@@ -16,8 +16,8 @@ import lib.manager.SessionManager;
 import lib.response.Response;
 import model.Wishlist;
 import utils.AlertHelper;
-import view.auth.LoginPage;
-import view.base.Page;
+import view.page.auth.LoginPage;
+import view.page.base.Page;
 import view.component.navbar.NavigationBar;
 import viewmodel.WishlistViewModel;
 
