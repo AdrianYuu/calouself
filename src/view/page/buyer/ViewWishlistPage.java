@@ -92,10 +92,10 @@ public final class ViewWishlistPage extends Page {
     }
 
     private Callback<TableColumn<WishlistViewModel, Void>, TableCell<WishlistViewModel, Void>> createActionCellFactory() {
-        return new Callback<>() {
+        return new Callback<TableColumn<WishlistViewModel, Void>, TableCell<WishlistViewModel, Void>>() {
             @Override
             public TableCell<WishlistViewModel, Void> call(final TableColumn<WishlistViewModel, Void> param) {
-                return new TableCell<>() {
+                return new TableCell<WishlistViewModel, Void>() {
                     private final Button removeBtn = new Button("Remove");
 
                     {
@@ -141,7 +141,7 @@ public final class ViewWishlistPage extends Page {
 
     @Override
     public void check() {
-        if(SessionManager.getCurrentUser() == null || !SessionManager.getCurrentUser().getRole().equals(UserRole.BUYER)){
+        if (SessionManager.getCurrentUser() == null || !SessionManager.getCurrentUser().getRole().equals(UserRole.BUYER)) {
             PageManager.changePage(LoginPage.getInstance(), "Login Page");
         }
     }

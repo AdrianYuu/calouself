@@ -14,6 +14,7 @@ import javafx.util.Callback;
 import lib.manager.PageManager;
 import lib.manager.SessionManager;
 import lib.response.Response;
+import model.Item;
 import model.Offer;
 import utils.AlertHelper;
 import view.page.auth.LoginPage;
@@ -105,10 +106,10 @@ public final class OfferItemPage extends Page {
     }
 
     private Callback<TableColumn<OfferViewModel, Void>, TableCell<OfferViewModel, Void>> createActionCellFactory() {
-        return new Callback<>() {
+        return new Callback<TableColumn<OfferViewModel, Void>, TableCell<OfferViewModel, Void>>() {
             @Override
             public TableCell<OfferViewModel, Void> call(final TableColumn<OfferViewModel, Void> param) {
-                return new TableCell<>() {
+                return new TableCell<OfferViewModel, Void>() {
                     private final Button acceptBtn = new Button("Accept");
                     private final Button declineBtn = new Button("Decline");
 
